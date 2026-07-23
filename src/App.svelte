@@ -223,6 +223,51 @@
     }
   }
 
+  // Interactive Custom Cursor State
+  let cursorX = $state(-100);
+  let cursorY = $state(-100);
+  let ringX = $state(-100);
+  let ringY = $state(-100);
+  let isHovered = $state(false);
+  let isClicking = $state(false);
+  let cursorVisible = $state(false);
+
+  let targetX = -100;
+  let targetY = -100;
+  let animFrameId: number;
+
+  function updateCursorPos(e: MouseEvent) {
+    cursorVisible = true;
+    targetX = e.clientX;
+    targetY = e.clientY;
+    cursorX = e.clientX;
+    cursorY = e.clientY;
+
+    const target = e.target as HTMLElement;
+    if (target) {
+      const interactive = target.closest('a, button, input, textarea, [data-src], .project-card, .screenshot-item, .nav-item');
+      isHovered = !!interactive;
+    }
+  }
+
+  function handleMouseDown() {
+    isClicking = true;
+  }
+
+  function handleMouseUp() {
+    isClicking = false;
+  }
+
+  function handleMouseLeave() {
+    cursorVisible = false;
+  }
+
+  function animateRing() {
+    ringX += (targetX - ringX) * 0.18;
+    ringY += (targetY - ringY) * 0.18;
+    animFrameId = requestAnimationFrame(animateRing);
+  }
+
   onMount(() => {
     updateTime();
     loadBio();
@@ -230,14 +275,25 @@
     fetchSelectedProjects();
     syncRouteFromHash();
 
+    animFrameId = requestAnimationFrame(animateRing);
+
     const interval = setInterval(updateTime, 1000);
     window.addEventListener('keydown', handleKeydown);
     window.addEventListener('hashchange', syncRouteFromHash);
+    window.addEventListener('mousemove', updateCursorPos);
+    window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mouseleave', handleMouseLeave);
 
     return () => {
       clearInterval(interval);
+      cancelAnimationFrame(animFrameId);
       window.removeEventListener('keydown', handleKeydown);
       window.removeEventListener('hashchange', syncRouteFromHash);
+      window.removeEventListener('mousemove', updateCursorPos);
+      window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mouseleave', handleMouseLeave);
     };
   });
 </script>
@@ -460,9 +516,90 @@
       </div>
     </div>
   {/if}
+
+  <!-- CUSTOM ANIMATED CURSOR -->
+  {#if cursorVisible}
+    <div 
+      class="custom-cursor-dot {isHovered ? 'hovered' : ''} {isClicking ? 'clicking' : ''}" 
+      style="transform: translate3d({cursorX}px, {cursorY}px, 0);"
+    ></div>
+    <div 
+      class="custom-cursor-ring {isHovered ? 'hovered' : ''} {isClicking ? 'clicking' : ''}" 
+      style="transform: translate3d({ringX}px, {ringY}px, 0);"
+    ></div>
+  {/if}
 </main>
 
 <style>
+  /* Custom Animated Cursor Styling Matching Reference Photo */
+  .custom-cursor-dot {
+    position: fixed;
+    top: -4px;
+    left: -4px;
+    width: 8px;
+    height: 8px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    transition: transform 0.05s linear, width 0.2s ease, height 0.2s ease, background-color 0.2s ease;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
+    will-change: transform;
+  }
+
+  .custom-cursor-ring {
+    position: fixed;
+    top: -16px;
+    left: -16px;
+    width: 32px;
+    height: 32px;
+    border: 2px solid rgba(255, 255, 255, 0.85);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99998;
+    transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+                height 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+                top 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+                left 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+                border-color 0.2s ease, 
+                background-color 0.2s ease;
+    box-shadow: 0 0 14px rgba(255, 255, 255, 0.15);
+    will-change: transform;
+  }
+
+  /* Hover state over interactive elements (buttons, links, screenshots) */
+  .custom-cursor-dot.hovered {
+    width: 6px;
+    height: 6px;
+    top: -3px;
+    left: -3px;
+    background-color: #ffffff;
+  }
+
+  .custom-cursor-ring.hovered {
+    top: -24px;
+    left: -24px;
+    width: 48px;
+    height: 48px;
+    border-color: rgba(255, 255, 255, 0.95);
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+
+  /* Active Click State */
+  .custom-cursor-dot.clicking {
+    transform: scale(0.6);
+  }
+
+  .custom-cursor-ring.clicking {
+    transform: scale(0.85);
+    border-color: #ffffff;
+  }
+
+  @media (pointer: coarse) {
+    .custom-cursor-dot, .custom-cursor-ring {
+      display: none !important;
+    }
+  }
   .portfolio-container {
     max-width: 760px;
     width: 100%;
@@ -760,6 +897,14 @@
     color: var(--text-secondary);
     font-size: 1rem;
     line-height: 1.65;
+  }
+
+  :global(.markdown-content p) {
+    margin-bottom: 0.85rem;
+  }
+
+  :global(.markdown-content p:last-child) {
+    margin-bottom: 0;
   }
 
   :global(.project-detail-body h1) {

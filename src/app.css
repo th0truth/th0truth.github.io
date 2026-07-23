@@ -23,6 +23,12 @@ html, body {
   overflow-x: hidden;
 }
 
+@media (pointer: fine) {
+  html, body, a, button, input, textarea, [data-src], .project-card, .screenshot-item {
+    cursor: none !important;
+  }
+}
+
 body {
   background-color: var(--bg-main);
   color: var(--text-primary);
