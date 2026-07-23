@@ -503,6 +503,15 @@
           <span>@th0truth</span>
         </a>
       </div>
+      <div class="link-item">
+        <span class="link-label">DEV Community</span>
+        <a href="https://dev.to/th0truth" target="_blank" rel="noreferrer" class="link-url">
+          <svg viewBox="0 0 448 512" width="15" height="15" fill="currentColor">
+            <path d="M120.12 208.29c-3.88-2.9-7.77-4.35-11.65-4.35H91.03v104.47h17.45c3.88 0 7.77-1.45 11.65-4.35 3.88-2.9 5.82-7.25 5.82-13.06v-69.65c.01-5.8-1.93-10.16-5.83-13.06zM400 32H48C21.5 32 0 53.5 0 80v352c0 26.5 21.5 48 48 48h352c26.5 0 48-21.5 48-48V80c0-26.5-21.5-48-48-48zM143.67 296.8c-7.2 9.68-18.06 14.52-32.57 14.52H67.89V200.73h43.21c14.51 0 25.37 4.84 32.57 14.52 7.2 9.68 10.8 22.01 10.8 37.02.01 15-3.59 27.34-10.8 37.02zm86.2-70.18h-41.69v30.48h37.08v24.16h-37.08v30.48h41.69v24.16h-69.96V200.73h69.96v25.89zm101.44 87.81c-15.65 0-25.37-12.58-29.23-37.75l-12.1-76.45h27.98l7.98 56.52c1.78 12.58 4.77 24.16 8.98 24.16 4.2 0 7.2-11.58 8.98-24.16l7.98-56.52h27.98l-12.1 76.45c-3.86 25.17-13.58 37.75-29.23 37.75z"/>
+          </svg>
+          <span>@th0truth</span>
+        </a>
+      </div>
     </div>
   </footer>
 
@@ -957,6 +966,39 @@
     grid-template-columns: repeat(3, 1fr);
     gap: 0.85rem;
     margin: 1.25rem 0 2rem 0;
+  }
+
+  :global(.project-logo-wrapper) {
+    display: inline-flex !important;
+    margin-bottom: 1.5rem !important;
+    padding: 0 !important;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    cursor: pointer;
+  }
+
+  :global(.hwmonitor-logo-img) {
+    height: 180px !important;
+    width: auto !important;
+    max-width: 100% !important;
+    object-fit: contain !important;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.15));
+    animation: logoGlowPulse 3.5s ease-in-out infinite alternate;
+    transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), filter 0.3s ease;
+  }
+
+  :global(.project-logo-wrapper:hover .hwmonitor-logo-img) {
+    filter: drop-shadow(0 0 24px rgba(255, 255, 255, 0.55));
+  }
+
+  @keyframes logoGlowPulse {
+    0% {
+      filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.12));
+    }
+    100% {
+      filter: drop-shadow(0 0 16px rgba(255, 255, 255, 0.35));
+    }
   }
 
   :global(.screenshot-item) {
