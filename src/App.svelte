@@ -942,12 +942,13 @@
     }
   }
   .portfolio-container {
-    width: 760px;
-    max-width: 100%;
+    width: 100%;
+    max-width: 760px;
     margin: 0 auto;
     box-sizing: border-box;
-    padding: 0 1.5rem;
+    padding: 0 1.25rem;
     position: relative;
+    overflow-x: hidden;
   }
 
   /* Navigation Header at Top */
@@ -1612,8 +1613,10 @@
   /* Selected Projects Grid */
   .project-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
     gap: 1.25rem;
+    width: 100%;
+    max-width: 100%;
   }
 
   .project-card {
@@ -1627,6 +1630,10 @@
     text-align: left;
     transition: border-color 0.2s ease, transform 0.2s ease;
     cursor: pointer;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+    overflow: hidden;
   }
 
   .project-card:hover {
@@ -1640,28 +1647,41 @@
     align-items: center;
     margin-bottom: 0.5rem;
     width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    gap: 0.5rem;
+    flex-wrap: wrap;
   }
 
   .card-title-group {
     display: flex;
     align-items: center;
     gap: 0.4rem;
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: wrap;
   }
 
   :global(.card-title-icon) {
     color: var(--text-muted);
+    flex-shrink: 0;
   }
 
   .card-header h3 {
     font-size: 1.1rem;
     color: var(--text-primary);
     font-family: var(--font-mono);
+    overflow-wrap: break-word;
+    word-break: break-word;
+    min-width: 0;
+    max-width: 100%;
   }
 
   .stars {
     font-family: var(--font-mono);
     font-size: 0.8rem;
     color: var(--text-secondary);
+    flex-shrink: 0;
   }
 
   .project-card p {
@@ -1669,6 +1689,8 @@
     color: var(--text-secondary);
     margin-bottom: 1rem;
     line-height: 1.5;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .tags {
@@ -1678,6 +1700,7 @@
     font-family: var(--font-mono);
     font-size: 0.75rem;
     color: var(--text-secondary);
+    max-width: 100%;
   }
 
   .tag-primary {
@@ -1686,6 +1709,9 @@
     padding: 0.15rem 0.45rem;
     border-radius: 4px;
     background: rgba(255, 255, 255, 0.03);
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .tag-item {
@@ -1694,6 +1720,9 @@
     padding: 0.15rem 0.45rem;
     border-radius: 4px;
     background: rgba(255, 255, 255, 0.015);
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   /* Dedicated Project Detail Section */
@@ -1787,20 +1816,57 @@
     transform: translateY(-6.5px) rotate(-45deg);
   }
 
+  :global(.markdown-content pre) {
+    max-width: 100%;
+    overflow-x: auto;
+    background: #18181c;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 0.75rem 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    white-space: pre-wrap;
+    word-break: break-all;
+  }
+
+  :global(.markdown-content code) {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    background: rgba(255, 255, 255, 0.05);
+    padding: 0.15em 0.35em;
+    border-radius: 4px;
+    word-break: break-word;
+  }
+
+  :global(.markdown-content img) {
+    max-width: 100%;
+    height: auto;
+  }
+
+  :global(.markdown-content table) {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+    overflow-x: auto;
+    border-collapse: collapse;
+  }
+
   .mobile-menu {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    background: rgba(9, 9, 11, 0.97);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border-bottom: 1px solid var(--border-color);
-    padding: 5rem 1.5rem 1.5rem;
+    top: 3.5rem;
+    left: 0.5rem;
+    right: 0.5rem;
+    background: rgba(20, 20, 24, 0.98);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    padding: 0.6rem;
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
-    z-index: 500;
+    z-index: 999;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
   }
 
   .mobile-nav-item {
