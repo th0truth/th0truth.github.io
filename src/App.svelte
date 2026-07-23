@@ -956,12 +956,17 @@
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 1.5rem;
     margin-bottom: 3.5rem;
     font-family: var(--font-mono);
     font-size: 0.95rem;
     width: 100%;
+  }
+
+  .nav-desktop {
+    display: flex;
+    align-items: center;
+    gap: 1.75rem;
+    flex-wrap: wrap;
   }
 
   .nav-item {
