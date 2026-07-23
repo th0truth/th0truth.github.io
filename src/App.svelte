@@ -998,6 +998,12 @@
     color: var(--text-muted);
   }
 
+  @media (max-width: 768px), (pointer: coarse) {
+    .nav-key {
+      display: none !important;
+    }
+  }
+
   :global(.nav-icon) {
     opacity: 0.6;
     transition: opacity 0.15s ease, color 0.15s ease;
