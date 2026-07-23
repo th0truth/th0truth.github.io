@@ -1,3 +1,7 @@
+<div class="project-logo-wrapper" data-src="./assets/projects/unified-logo.png">
+  <img src="./assets/projects/unified-logo.png" alt="Unified API logo" class="hwmonitor-logo-img" />
+</div>
+
 # Unified API
 
 Learning Management System (LMS) designed for educational institutions. It simplifies **course management**, **assessments**, and **academic workflows** by bringing core learning and administrative functions into a single, cohesive system.

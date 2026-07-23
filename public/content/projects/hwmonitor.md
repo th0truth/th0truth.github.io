@@ -1,5 +1,5 @@
-<div class="project-logo-wrapper" data-src="https://github.com/th0truth/hwmonitor/raw/master/.github/assets/logo.png">
-  <img src="https://github.com/th0truth/hwmonitor/raw/master/.github/assets/logo.png" alt="hwmonitor logo" class="hwmonitor-logo-img" />
+<div class="project-logo-wrapper" data-src="./assets/projects/hwmonitor-logo.png">
+  <img src="./assets/projects/hwmonitor-logo.png" alt="hwmonitor logo" class="hwmonitor-logo-img" />
 </div>
 
 # hwmonitor
