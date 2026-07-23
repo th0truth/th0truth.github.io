@@ -1,0 +1,68 @@
+{
+  "technical": [
+    {
+      "category": "Programming Languages",
+      "primary": ["Python", "C", "C++"],
+      "familiar": ["JavaScript", "TypeScript"]
+    },
+    {
+      "category": "Backend Architecture & APIs",
+      "items": ["FastAPI", "Flask", "Uvicorn", "Pydantic", "REST APIs", "JWT", "OAuth 2.0", "UV", "Poetry"]
+    },
+    {
+      "category": "Databases & Caching",
+      "items": ["MongoDB", "Redis", "PostgreSQL", "SQLite"]
+    },
+    {
+      "category": "Infrastructure & CI/CD",
+      "items": ["Docker", "GitHub Actions", "CI/CD Pipelines", "Render"]
+    },
+    {
+      "category": "Testing, Automation & Scraping",
+      "items": ["Pytest", "Selenium", "BeautifulSoup4"]
+    },
+    {
+      "category": "Artificial Intelligence & Vision",
+      "items": ["Codex", "OpenCode", "OpenCV", "YOLO"]
+    },
+    {
+      "category": "Embedded Systems & Protocols",
+      "items": ["STM32", "ESP32", "UART", "I2C", "SPI"]
+    },
+    {
+      "category": "Linux & Virtualization",
+      "items": ["Linux (Debian / Arch)", "QEMU", "VirtualBox", "VMware"]
+    },
+    {
+      "category": "Tools & Environment",
+      "items": ["Git", "Bash", "tmux", "vim", "kitty"]
+    }
+  ],
+  "soft": [
+    {
+      "title": "Quick learner of new technologies",
+      "icon": "⚡",
+      "description": "Fast adaptation to novel frameworks, libraries, and hardware platforms."
+    },
+    {
+      "title": "Proficient with technical documentation",
+      "icon": "📚",
+      "description": "Able to thoroughly read datasheets, specs, and write clean maintainable docs."
+    },
+    {
+      "title": "Leadership skills",
+      "icon": "🎯",
+      "description": "Guiding technical direction, architectural decisions, and mentoring peers."
+    },
+    {
+      "title": "Excellent problem-solving",
+      "icon": "🧩",
+      "description": "Analytical approach to debugging low-level hardware bugs and complex backend issues."
+    },
+    {
+      "title": "Strong collaboration & teamwork",
+      "icon": "🤝",
+      "description": "Clear communication across cross-functional engineering teams."
+    }
+  ]
+}

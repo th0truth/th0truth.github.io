@@ -3,11 +3,12 @@
   import { fade } from 'svelte/transition';
   import { parse } from 'marked';
   import DOMPurify from 'dompurify';
-  import { Home, Briefcase, FolderGit2, ArrowLeft, ExternalLink, Code2, Clock, X } from '@lucide/svelte';
+  import { Home, Briefcase, FolderGit2, ArrowLeft, ExternalLink, Code2, Clock, X, ChevronRight, Layers } from '@lucide/svelte';
 
   // Navigation Items
   const navItems = [
     { key: 'h', label: 'home', id: 'home', hash: '#/', icon: Home },
+    { key: 's', label: 'skills', id: 'skills', hash: '#/skills', icon: Layers },
     { key: 'e', label: 'experience', id: 'experience', hash: '#/experience', icon: Briefcase },
     { key: 'p', label: 'projects', id: 'projects', hash: '#/projects', icon: FolderGit2 }
   ];
@@ -38,7 +39,27 @@
   let experiences = $state<ExperienceMeta[]>([]);
   let loadingExp = $state(true);
 
-  // Selected Projects State
+  // Skills Dynamic State
+  interface SkillTechCategory {
+    category: string;
+    primary?: string[];
+    familiar?: string[];
+    items?: string[];
+  }
+
+  interface SoftSkillItem {
+    title: string;
+    icon: string;
+    description: string;
+  }
+
+  interface SkillsData {
+    technical: SkillTechCategory[];
+    soft: SoftSkillItem[];
+  }
+
+  let skillsData = $state<SkillsData>({ technical: [], soft: [] });
+  let loadingSkills = $state(true);
   interface ProjectMeta {
     slug: string;
     name: string;
@@ -55,6 +76,31 @@
   let selectedProjectSlug = $state<string | null>(null);
   let projectDetailHtml = $state('');
   let loadingProjectDetail = $state(false);
+
+  // Derived: deduplicated tech stack for home page display
+  let uniqueTechs = $derived.by(() => {
+    const seen = new Map<string, string>();
+    for (const exp of experiences ?? []) {
+      for (const t of exp?.techStack ?? []) {
+        const key = t.toLowerCase();
+        if (!seen.has(key) || t !== t.toLowerCase()) seen.set(key, t);
+      }
+    }
+    for (const p of projects ?? []) {
+      if (p?.language) {
+        const key = p.language.toLowerCase();
+        if (!seen.has(key) || p.language !== p.language.toLowerCase()) seen.set(key, p.language);
+      }
+      for (const t of p?.tags ?? []) {
+        const key = t.toLowerCase();
+        if (!seen.has(key)) seen.set(key, t);
+      }
+    }
+    return [...seen.values()].sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()));
+  });
+
+  // Derived: first 3 projects for featured section on home page
+  let featuredProjects = $derived((projects ?? []).slice(0, 3));
 
   // Configure DOMPurify to allow standard HTML plus dataset & class attributes
   const purifyConfig = {
@@ -73,6 +119,10 @@
 
     if (hash === '#/' || hash === '') {
       currentTab = 'home';
+      selectedProject = null;
+      selectedProjectSlug = null;
+    } else if (hash === '#/skills') {
+      currentTab = 'skills';
       selectedProject = null;
       selectedProjectSlug = null;
     } else if (hash === '#/experience') {
@@ -269,9 +319,23 @@
     animFrameId = requestAnimationFrame(animateRing);
   }
 
+  async function loadSkills() {
+    try {
+      loadingSkills = true;
+      const res = await fetch('./content/skills/skills.json');
+      if (!res.ok) throw new Error('Failed to load skills data');
+      skillsData = await res.json();
+    } catch (err) {
+      console.error('Error loading skills:', err);
+    } finally {
+      loadingSkills = false;
+    }
+  }
+
   onMount(() => {
     updateTime();
     loadBio();
+    loadSkills();
     loadExperiences();
     fetchSelectedProjects();
     syncRouteFromHash();
@@ -345,8 +409,12 @@
           </div>
         </div>
         <div class="profile-titles">
-          <h1 class="profile-name">th0truth</h1>
-          <p class="profile-role">software engineer</p>
+          <h1 class="profile-name">Vladyslav Panasiuk</h1>
+          <p class="profile-handle">@th0truth · <span class="profile-role">software engineer</span></p>
+          <div class="availability-badge">
+            <span class="availability-dot"></span>
+            <span>Open to work</span>
+          </div>
         </div>
       </div>
 
@@ -356,6 +424,186 @@
       {:else}
         <div class="bio-text markdown-content">
           {@html bioHtml}
+        </div>
+      {/if}
+
+      <!-- Work Experience Preview -->
+      <div class="home-section-block" style="margin-top: 3.5rem;">
+        <div class="section-title-wrapper">
+          <Briefcase size={18} class="section-icon" />
+          <h2>Work Experience</h2>
+        </div>
+        {#if loadingExp}
+          <p class="status-msg">Loading...</p>
+        {:else if experiences.length > 0}
+          {#each experiences as exp}
+            <div class="exp-preview-card">
+              <div class="exp-title-row">
+                <h3 class="exp-role">{exp.role}</h3>
+                <span class="badge-freelance">{exp.type}</span>
+              </div>
+              <div class="exp-period">{exp.period}</div>
+              {#if exp.techStack && exp.techStack.length > 0}
+                <div class="exp-preview-tags">
+                  {#each exp.techStack as tech}
+                    <span class="tag-item">{tech}</span>
+                  {/each}
+                </div>
+              {/if}
+            </div>
+          {/each}
+          <a href="#/experience" class="show-more-link">
+            Show More
+            <ChevronRight size={14} />
+          </a>
+        {/if}
+      </div>
+
+      <!-- Technical & Soft Skills Summary (Concise) -->
+      <div class="home-section-block">
+        <div class="section-title-wrapper">
+          <Layers size={18} class="section-icon" />
+          <h2>Technical & Soft Skills</h2>
+        </div>
+        <div class="home-skills-summary">
+          <div class="skills-summary-group">
+            <span class="skills-summary-label">Primary Languages & Backend:</span>
+            <div class="tech-stack-grid">
+              <span class="tech-pill highlight">Python</span>
+              <span class="tech-pill highlight">C</span>
+              <span class="tech-pill highlight">C++</span>
+              <span class="tech-pill">FastAPI</span>
+              <span class="tech-pill">Flask</span>
+              <span class="tech-pill">REST APIs</span>
+              <span class="tech-pill">Docker</span>
+              <span class="tech-pill">MongoDB</span>
+              <span class="tech-pill">Redis</span>
+            </div>
+          </div>
+          <div class="skills-summary-group">
+            <span class="skills-summary-label">Domains & Highlights:</span>
+            <div class="tech-stack-grid">
+              <span class="tech-pill">Embedded (STM32 / ESP32)</span>
+              <span class="tech-pill">Computer Vision (YOLO / OpenCV)</span>
+              <span class="tech-pill">Linux Systems</span>
+              <span class="tech-pill soft-pill">Leadership</span>
+              <span class="tech-pill soft-pill">Problem-Solving</span>
+              <span class="tech-pill soft-pill">Teamwork</span>
+            </div>
+          </div>
+        </div>
+        <a href="#/skills" class="show-more-link">
+          Show All Skills
+          <ChevronRight size={14} />
+        </a>
+      </div>
+
+      <!-- Featured Projects -->
+      <div class="home-section-block">
+        <div class="section-title-wrapper">
+          <FolderGit2 size={18} class="section-icon" />
+          <h2>Featured Projects</h2>
+        </div>
+        {#if loadingProjects}
+          <p class="status-msg">Loading...</p>
+        {:else if featuredProjects.length > 0}
+          <div class="featured-project-list">
+            {#each featuredProjects as project}
+              <button class="featured-project-row" onclick={() => openProjectDetail(project)}>
+                <div class="row-left">
+                  <div class="row-header">
+                    <Code2 size={15} class="card-title-icon" />
+                    <span class="row-title">{project.name}</span>
+                    {#if project.language}
+                      <span class="tag-primary compact">{project.language}</span>
+                    {/if}
+                  </div>
+                  <p class="row-desc">{project.description}</p>
+                </div>
+                <div class="row-right">
+                  <ChevronRight size={16} class="row-arrow" />
+                </div>
+              </button>
+            {/each}
+          </div>
+          <a href="#/projects" class="show-more-link">
+            View all projects
+            <ChevronRight size={14} />
+          </a>
+        {/if}
+      </div>
+    </section>
+
+  {:else if currentTab === 'skills' && !selectedProject}
+    <section class="tab-content" in:fade={{ duration: 180 }}>
+      <div class="section-title-wrapper">
+        <Layers size={20} class="section-icon" />
+        <h2>Skills & Expertise</h2>
+      </div>
+
+      {#if loadingSkills}
+        <p class="status-msg">Loading skills...</p>
+      {:else}
+        <!-- Technical Skills with Timeline Nodes & Vertical Lines -->
+        <div class="skills-category-block">
+          <h3 class="skills-cat-header">Technical Skills</h3>
+
+          <div class="timeline-list">
+            {#each (skillsData?.technical ?? []) as group}
+              <div class="timeline-item">
+                <div class="timeline-line-col">
+                  <div class="timeline-node"></div>
+                  <div class="timeline-vertical-line"></div>
+                </div>
+                <div class="timeline-card">
+                  <h4 class="skill-group-title">{group.category}</h4>
+                  {#if group.primary}
+                    <div class="skill-detail-row">
+                      <span class="sub-label">Primary:</span>
+                      <div class="tech-stack-grid">
+                        {#each group.primary as item}
+                          <span class="tech-pill highlight">{item}</span>
+                        {/each}
+                      </div>
+                    </div>
+                  {/if}
+                  {#if group.familiar}
+                    <div class="skill-detail-row">
+                      <span class="sub-label">Familiar:</span>
+                      <div class="tech-stack-grid">
+                        {#each group.familiar as item}
+                          <span class="tech-pill">{item}</span>
+                        {/each}
+                      </div>
+                    </div>
+                  {/if}
+                  {#if group.items}
+                    <div class="tech-stack-grid">
+                      {#each group.items as item}
+                        <span class="tech-pill">{item}</span>
+                      {/each}
+                    </div>
+                  {/if}
+                </div>
+              </div>
+            {/each}
+          </div>
+        </div>
+
+        <!-- Soft Skills Section -->
+        <div class="skills-category-block" style="margin-top: 3.5rem;">
+          <h3 class="skills-cat-header">Soft Skills</h3>
+          <div class="soft-skills-grid">
+            {#each (skillsData?.soft ?? []) as soft}
+              <div class="soft-skill-card">
+                <span class="soft-skill-icon">{soft.icon}</span>
+                <div>
+                  <h4 class="soft-skill-title">{soft.title}</h4>
+                  <p class="soft-skill-desc">{soft.description}</p>
+                </div>
+              </div>
+            {/each}
+          </div>
         </div>
       {/if}
     </section>
@@ -495,6 +743,15 @@
 
     <div class="links-grid">
       <div class="link-item">
+        <span class="link-label">LinkedIn</span>
+        <a href="https://www.linkedin.com/in/vladyslav-panasiuk-481582370" target="_blank" rel="noreferrer" class="link-url">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
+            <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.28 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.75M6.46 10.9v8.37H9.25V10.9H6.46M7.86 6.6a1.4 1.4 0 1 0 1.4 1.4 1.4 1.4 0 0 0-1.4-1.4z"/>
+          </svg>
+          <span>vladyslav-panasiuk</span>
+        </a>
+      </div>
+      <div class="link-item">
         <span class="link-label">GitHub</span>
         <a href="https://github.com/th0truth" target="_blank" rel="noreferrer" class="link-url">
           <svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor">
@@ -631,12 +888,28 @@
   }
 
   .nav-item {
+    position: relative;
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
     color: var(--text-muted);
     transition: color 0.15s ease;
     text-decoration: none !important;
+    padding-bottom: 4px;
+  }
+
+  .nav-item::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 100%;
+    height: 1px;
+    background: #ffffff;
+    opacity: 0;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: opacity 0.2s ease, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   }
 
   .nav-key {
@@ -644,22 +917,28 @@
   }
 
   :global(.nav-icon) {
-    opacity: 0.7;
-    transition: opacity 0.15s ease;
+    opacity: 0.6;
+    transition: opacity 0.15s ease, color 0.15s ease;
   }
 
-  .nav-item.active :global(.nav-icon) {
+  .nav-item.active :global(.nav-icon),
+  .nav-item:hover :global(.nav-icon) {
     opacity: 1;
+    color: #ffffff !important;
   }
 
   .nav-item.active .nav-label {
     color: var(--text-primary);
-    text-decoration: underline !important;
-    text-underline-offset: 4px;
+  }
+
+  .nav-item.active::after,
+  .nav-item:hover::after {
+    opacity: 1;
+    transform: scaleX(1);
   }
 
   .nav-item:hover {
-    color: var(--text-secondary);
+    color: var(--text-primary);
   }
 
   /* Profile Avatar Header & Subdued Radar Ring */
@@ -772,11 +1051,17 @@
     color: var(--text-primary);
   }
 
-  .profile-role {
+  .profile-handle {
     font-family: var(--font-mono);
     color: var(--text-secondary);
     font-size: 0.95rem;
     margin-top: 0.35rem;
+  }
+
+  .profile-role {
+    font-family: var(--font-mono);
+    color: var(--text-secondary);
+    font-size: 0.95rem;
   }
 
   /* Multi-Job Dynamic Timeline Layout */
@@ -810,6 +1095,7 @@
     margin-top: 0.35rem;
     z-index: 2;
     box-shadow: 0 0 6px rgba(113, 113, 122, 0.4);
+    animation: nodePulse 3.5s ease-in-out infinite;
   }
 
   .timeline-vertical-line {
@@ -820,6 +1106,65 @@
     width: 2px;
     background: linear-gradient(180deg, #52525b 0%, #27272a 100%);
     z-index: 1;
+    overflow: hidden;
+  }
+
+  .timeline-vertical-line::after {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, transparent 0%, rgba(255, 255, 255, 0.35) 50%, transparent 100%);
+    animation: lineLightPulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+
+  .timeline-item:nth-child(1) .timeline-vertical-line::after,
+  .timeline-item:nth-child(1) .timeline-node { animation-delay: 0s; }
+  .timeline-item:nth-child(2) .timeline-vertical-line::after,
+  .timeline-item:nth-child(2) .timeline-node { animation-delay: 0.3s; }
+  .timeline-item:nth-child(3) .timeline-vertical-line::after,
+  .timeline-item:nth-child(3) .timeline-node { animation-delay: 0.6s; }
+  .timeline-item:nth-child(4) .timeline-vertical-line::after,
+  .timeline-item:nth-child(4) .timeline-node { animation-delay: 0.9s; }
+  .timeline-item:nth-child(5) .timeline-vertical-line::after,
+  .timeline-item:nth-child(5) .timeline-node { animation-delay: 1.2s; }
+  .timeline-item:nth-child(6) .timeline-vertical-line::after,
+  .timeline-item:nth-child(6) .timeline-node { animation-delay: 1.5s; }
+  .timeline-item:nth-child(7) .timeline-vertical-line::after,
+  .timeline-item:nth-child(7) .timeline-node { animation-delay: 1.8s; }
+  .timeline-item:nth-child(8) .timeline-vertical-line::after,
+  .timeline-item:nth-child(8) .timeline-node { animation-delay: 2.1s; }
+  .timeline-item:nth-child(9) .timeline-vertical-line::after,
+  .timeline-item:nth-child(9) .timeline-node { animation-delay: 2.4s; }
+
+  @keyframes lineLightPulse {
+    0% {
+      top: -100%;
+      opacity: 0;
+    }
+    30% {
+      opacity: 1;
+    }
+    70% {
+      opacity: 1;
+    }
+    100% {
+      top: 100%;
+      opacity: 0;
+    }
+  }
+
+  @keyframes nodePulse {
+    0%, 100% {
+      border-color: #71717a;
+      box-shadow: 0 0 6px rgba(113, 113, 122, 0.4);
+    }
+    50% {
+      border-color: #a1a1aa;
+      box-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+    }
   }
 
   .timeline-item:last-child .timeline-vertical-line {
@@ -1363,5 +1708,299 @@
     .timeline-item {
       gap: 0.85rem;
     }
+  }
+
+  /* ═══ Home Page Enhancement Styles ═══ */
+
+  /* Availability Badge */
+  .availability-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.3rem;
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--accent-green);
+  }
+
+  .availability-dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent-green);
+    box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
+    animation: pulseGlow 2.5s ease-in-out infinite;
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% {
+      box-shadow: 0 0 4px rgba(16, 185, 129, 0.4);
+      opacity: 1;
+    }
+    50% {
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.75);
+      opacity: 0.7;
+    }
+  }
+
+  /* Home Section Blocks */
+  .home-section-block {
+    margin-bottom: 3.5rem;
+  }
+
+  .home-section-block .section-title-wrapper {
+    margin-bottom: 1.25rem;
+  }
+
+  /* Experience Preview Card */
+  .exp-preview-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 1rem 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 0.65rem;
+    transition: border-color 0.25s ease, transform 0.25s ease;
+  }
+
+  .exp-preview-card:hover {
+    border-color: #5e5e65;
+    transform: translateX(2px);
+  }
+
+  .exp-preview-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.55rem;
+  }
+
+  /* Show More Link */
+  .show-more-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    text-decoration: none;
+    margin-top: 1.25rem;
+    transition: color 0.15s ease, gap 0.15s ease;
+  }
+
+  .show-more-link:hover {
+    color: var(--text-primary);
+    gap: 0.5rem;
+  }
+
+  /* Tech Stack Grid */
+  .tech-stack-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+  }
+
+  .tech-pill {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+    padding: 0.18rem 0.55rem;
+    border-radius: 4px;
+    background: rgba(255, 255, 255, 0.015);
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .tech-pill.highlight {
+    color: var(--text-primary);
+    border-color: #5e5e65;
+    background: rgba(255, 255, 255, 0.05);
+    font-weight: 500;
+  }
+
+  .tech-pill.soft-pill {
+    color: #a1a1aa;
+    border-style: dashed;
+  }
+
+  .home-skills-summary {
+    display: flex;
+    flex-direction: column;
+    gap: 0.85rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 1.1rem;
+    border-radius: 8px;
+  }
+
+  .skills-summary-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+
+  .skills-summary-label {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  /* Skills Dedicated Page Styles */
+  .skills-category-block {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .skills-cat-header {
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 0.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .skill-group-title {
+    font-size: 1.05rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .skill-detail-row {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    margin-bottom: 0.4rem;
+  }
+
+  .sub-label {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    min-width: 65px;
+  }
+
+  .soft-skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+
+  .soft-skill-card {
+    display: flex;
+    gap: 0.85rem;
+    align-items: flex-start;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 1rem 1.15rem;
+    border-radius: 8px;
+    transition: border-color 0.2s ease;
+  }
+
+  .soft-skill-card:hover {
+    border-color: #5e5e65;
+  }
+
+  .soft-skill-icon {
+    font-size: 1.25rem;
+    line-height: 1;
+  }
+
+  .soft-skill-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+  }
+
+  .soft-skill-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+  }
+
+  /* Concise Featured Projects List */
+  .featured-project-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
+  }
+
+  .featured-project-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 0.85rem 1.15rem;
+    border-radius: 8px;
+    text-align: left;
+    transition: border-color 0.25s ease, transform 0.25s ease;
+    cursor: pointer;
+  }
+
+  .featured-project-row:hover {
+    border-color: #5e5e65;
+    transform: translateX(3px);
+  }
+
+  .featured-project-row .row-left {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .featured-project-row .row-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .featured-project-row .row-title {
+    font-family: var(--font-mono);
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-primary);
+  }
+
+  .featured-project-row .row-desc {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .tag-primary.compact {
+    font-size: 0.7rem;
+    padding: 0.1rem 0.35rem;
+  }
+
+  .featured-project-row .row-right {
+    display: flex;
+    align-items: center;
+    padding-left: 0.85rem;
+    color: var(--text-muted);
+    transition: color 0.15s ease;
+  }
+
+  .featured-project-row:hover :global(.card-title-icon),
+  .featured-project-row:hover .row-right {
+    color: #ffffff !important;
+    opacity: 1 !important;
+  }
+
+  /* Global Card & Row Icon Hover Enhancements */
+  :global(.card-title-icon),
+  :global(.section-icon),
+  :global(.nav-icon) {
+    transition: color 0.2s ease, opacity 0.2s ease;
+  }
+
+  .project-card:hover :global(.card-title-icon) {
+    color: #ffffff !important;
   }
 </style>
