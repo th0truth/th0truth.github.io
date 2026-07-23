@@ -1,0 +1,6 @@
+- Built asynchronous Telegram listing parsers using **Telethon**.
+- Developed interactive notification bot with **Aiogram**.
+- Implemented duplicate & noise filtering logic for listings.
+- Optimized media processing via in-memory image downloads (zero disk I/O).
+- Integrated **Redis** caching & background processing.
+- Containerized deployment with **Docker**.

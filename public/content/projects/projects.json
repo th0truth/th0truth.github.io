@@ -1,0 +1,74 @@
+[
+  {
+    "slug": "hwmonitor",
+    "name": "hwmonitor",
+    "description": "Lightweight hardware discovery and monitoring CLI for Linux in pure C11 reading directly from /sys and /proc.",
+    "language": "C11",
+    "stars": 0,
+    "tags": ["c11", "linux-kernel", "sysfs", "groq-ai"],
+    "githubUrl": "https://github.com/th0truth/hwmonitor"
+  },
+  {
+    "slug": "unified",
+    "name": "Unified API",
+    "description": "Learning Management System (LMS) designed for educational institutions simplifying course management & academic workflows.",
+    "language": "Python",
+    "stars": 0,
+    "tags": ["fastapi", "mongodb", "redis", "docker", "lms"],
+    "githubUrl": "https://github.com/UnifiedLMS/unified-api"
+  },
+  {
+    "slug": "fastapi-nosql-template",
+    "name": "FastAPI-NoSQL-Template",
+    "description": "Type-safe, fully asynchronous FastAPI template for NoSQL applications with auth, caching, and Prometheus monitoring.",
+    "language": "Python",
+    "stars": 0,
+    "tags": ["fastapi", "mongodb", "redis", "graphql", "prometheus"],
+    "githubUrl": "https://github.com/th0truth/fastapi-nosql-template"
+  },
+  {
+    "slug": "barnsight",
+    "name": "BarnSight",
+    "description": "Computer vision platform using edge AI & farm cameras to detect organic floor contamination for automated farm hygiene.",
+    "language": "Python",
+    "stars": 0,
+    "tags": ["opencv", "yolo", "edge-ai", "fastapi", "computer-vision"],
+    "githubUrl": "https://github.com/barnsight"
+  },
+  {
+    "slug": "screen-broadcaster",
+    "name": "screen-broadcaster",
+    "description": "Real-time desktop screen broadcasting and video streaming application over network sockets.",
+    "language": "Python",
+    "stars": 0,
+    "tags": ["streaming", "sockets", "networking", "python"],
+    "githubUrl": "https://github.com/th0truth/screen-broadcaster"
+  },
+  {
+    "slug": "numeral-system-converter",
+    "name": "numeral-system-converter",
+    "description": "Fast C/C++ utility for converting numbers across binary, octal, decimal, and hexadecimal bases.",
+    "language": "C++",
+    "stars": 0,
+    "tags": ["converter", "algorithms", "cpp", "cli"],
+    "githubUrl": "https://github.com/th0truth/numeral-system-converter"
+  },
+  {
+    "slug": "stm32-triple-adc-pwm-display",
+    "name": "stm32-triple-adc-pwm-display",
+    "description": "STM32 Blue Pill firmware for triple ADC DMA sampling, PWM regulation, and ST7735 SPI TFT display rendering.",
+    "language": "C++",
+    "stars": 0,
+    "tags": ["stm32", "adc-dma", "pwm", "st7735-tft", "embedded-cpp"],
+    "githubUrl": "https://github.com/th0truth/stm32-triple-adc-pwm-display"
+  },
+  {
+    "slug": "algorithms",
+    "name": "algorithms",
+    "description": "High-performance C++ sorting algorithm visualization & CUDA GPGPU benchmarking.",
+    "language": "C++",
+    "stars": 0,
+    "tags": ["algorithms", "cuda", "sdl2", "cpp17"],
+    "githubUrl": "https://github.com/th0truth/algorithms"
+  }
+]
