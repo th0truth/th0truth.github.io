@@ -3,7 +3,18 @@
   import { fade } from 'svelte/transition';
   import { parse } from 'marked';
   import DOMPurify from 'dompurify';
-  import { Home, Briefcase, FolderGit2, ArrowLeft, ExternalLink, Code2, Clock, X, ChevronRight, Layers } from '@lucide/svelte';
+  import { Home, Briefcase, FolderGit2, ArrowLeft, ExternalLink, Code2, Clock, X, ChevronRight, Layers, Cpu, GraduationCap, Database, Eye, Tv, Binary, CircuitBoard, BarChart3 } from '@lucide/svelte';
+
+  const projectIconsMap: Record<string, any> = {
+    Cpu,
+    GraduationCap,
+    Database,
+    Eye,
+    Tv,
+    Binary,
+    CircuitBoard,
+    BarChart3
+  };
 
   // Navigation Items
   const navItems = [
@@ -64,11 +75,19 @@
   interface ProjectMeta {
     slug: string;
     name: string;
+    icon?: string;
     description: string;
     language: string;
     stars: number;
     tags: string[];
     githubUrl: string;
+  }
+
+  function getProjectIcon(iconName?: string) {
+    if (iconName && projectIconsMap[iconName]) {
+      return projectIconsMap[iconName];
+    }
+    return Code2;
   }
 
   let projects = $state<ProjectMeta[]>([]);
@@ -525,10 +544,11 @@
         {:else if featuredProjects.length > 0}
           <div class="featured-project-list">
             {#each featuredProjects as project}
+              {@const Icon = getProjectIcon(project.icon)}
               <button class="featured-project-row" onclick={() => openProjectDetail(project)}>
                 <div class="row-left">
                   <div class="row-header">
-                    <Code2 size={15} class="card-title-icon" />
+                    <Icon size={15} class="card-title-icon" />
                     <span class="row-title">{project.name}</span>
                     {#if project.language}
                       <span class="tag-primary compact">{project.language}</span>
@@ -696,10 +716,11 @@
       {:else}
         <div class="project-grid">
           {#each projects as project}
+            {@const Icon = getProjectIcon(project.icon)}
             <button class="project-card" onclick={() => openProjectDetail(project)}>
               <div class="card-header">
                 <div class="card-title-group">
-                  <Code2 size={16} class="card-title-icon" />
+                  <Icon size={16} class="card-title-icon" />
                   <h3>{project.name}</h3>
                 </div>
                 {#if project.stars > 0}

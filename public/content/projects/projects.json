@@ -2,6 +2,7 @@
   {
     "slug": "hwmonitor",
     "name": "hwmonitor",
+    "icon": "Cpu",
     "description": "Lightweight hardware discovery and monitoring CLI for Linux in pure C11 reading directly from /sys and /proc.",
     "language": "C11",
     "stars": 0,
@@ -11,6 +12,7 @@
   {
     "slug": "unified",
     "name": "Unified API",
+    "icon": "GraduationCap",
     "description": "Learning Management System (LMS) designed for educational institutions simplifying course management & academic workflows.",
     "language": "Python",
     "stars": 0,
@@ -20,6 +22,7 @@
   {
     "slug": "fastapi-nosql-template",
     "name": "FastAPI-NoSQL-Template",
+    "icon": "Database",
     "description": "Type-safe, fully asynchronous FastAPI template for NoSQL applications with auth, caching, and Prometheus monitoring.",
     "language": "Python",
     "stars": 0,
@@ -29,6 +32,7 @@
   {
     "slug": "barnsight",
     "name": "BarnSight",
+    "icon": "Eye",
     "description": "Computer vision platform using edge AI & farm cameras to detect organic floor contamination for automated farm hygiene.",
     "language": "Python",
     "stars": 0,
@@ -38,6 +42,7 @@
   {
     "slug": "screen-broadcaster",
     "name": "screen-broadcaster",
+    "icon": "Tv",
     "description": "Real-time desktop screen broadcasting and video streaming application over network sockets.",
     "language": "Python",
     "stars": 0,
@@ -47,6 +52,7 @@
   {
     "slug": "numeral-system-converter",
     "name": "numeral-system-converter",
+    "icon": "Binary",
     "description": "Fast C/C++ utility for converting numbers across binary, octal, decimal, and hexadecimal bases.",
     "language": "C++",
     "stars": 0,
@@ -56,6 +62,7 @@
   {
     "slug": "stm32-triple-adc-pwm-display",
     "name": "stm32-triple-adc-pwm-display",
+    "icon": "CircuitBoard",
     "description": "STM32 Blue Pill firmware for triple ADC DMA sampling, PWM regulation, and ST7735 SPI TFT display rendering.",
     "language": "C++",
     "stars": 0,
@@ -65,6 +72,7 @@
   {
     "slug": "algorithms",
     "name": "algorithms",
+    "icon": "BarChart3",
     "description": "High-performance C++ sorting algorithm visualization & CUDA GPGPU benchmarking.",
     "language": "C++",
     "stars": 0,
