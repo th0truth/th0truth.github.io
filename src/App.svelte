@@ -1,5 +1,6 @@
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { fade } from 'svelte/transition';
   import { parse } from 'marked';
   import DOMPurify from 'dompurify';
   import { Home, Briefcase, FolderGit2, ArrowLeft, ExternalLink, Code2, Clock, X } from '@lucide/svelte';
@@ -316,7 +317,7 @@
 
   <!-- TAB CONTENT: HOME -->
   {#if currentTab === 'home' && !selectedProject}
-    <section class="tab-content bio-section">
+    <section class="tab-content bio-section" in:fade={{ duration: 180 }}>
       <!-- Profile Avatar & Title Header with Subdued Glow Radar Ring -->
       <div class="profile-header">
         <div class="avatar-radar-wrapper">
@@ -360,7 +361,7 @@
     </section>
 
   {:else if currentTab === 'experience' && !selectedProject}
-    <section class="tab-content">
+    <section class="tab-content" in:fade={{ duration: 180 }}>
       <div class="section-title-wrapper">
         <Briefcase size={20} class="section-icon" />
         <h2>Experience</h2>
@@ -418,7 +419,7 @@
     </section>
 
   {:else if currentTab === 'projects' && !selectedProject}
-    <section class="tab-content">
+    <section class="tab-content" in:fade={{ duration: 180 }}>
       <div class="section-title-wrapper">
         <FolderGit2 size={20} class="section-icon" />
         <h2>Selected Projects</h2>
@@ -458,7 +459,7 @@
 
   <!-- DEDICATED PROJECT DETAIL PAGE -->
   {:else if selectedProject}
-    <section class="tab-content project-detail-section">
+    <section class="tab-content project-detail-section" in:fade={{ duration: 180 }}>
       <div class="detail-top-bar">
         <button class="back-btn" onclick={closeProjectDetail}>
           <ArrowLeft size={16} class="btn-icon" />
