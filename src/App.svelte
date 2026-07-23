@@ -26,6 +26,11 @@
 
   let currentTab = $state('home');
   let currentTime = $state('');
+  let mobileMenuOpen = $state(false);
+
+  function closeMobileMenu() {
+    mobileMenuOpen = false;
+  }
 
   // Bio State
   let bioHtml = $state('');
@@ -401,18 +406,50 @@
 <main class="portfolio-container" onclick={handleContainerClick}>
   <!-- Top Navigation Header -->
   <nav class="nav-bar">
-    {#each navItems as item}
-      {@const Icon = item.icon}
-      <a 
-        href={item.hash}
-        class="nav-item {currentTab === item.id && !selectedProject ? 'active' : ''}"
-      >
-        <span class="nav-key">[{item.key}]</span>
-        <Icon size={15} class="nav-icon" />
-        <span class="nav-label">{item.label}</span>
-      </a>
-    {/each}
+    <!-- Desktop nav items -->
+    <div class="nav-desktop">
+      {#each navItems as item}
+        {@const Icon = item.icon}
+        <a
+          href={item.hash}
+          class="nav-item {currentTab === item.id && !selectedProject ? 'active' : ''}"
+          onclick={closeMobileMenu}
+        >
+          <span class="nav-key">[{item.key}]</span>
+          <Icon size={15} class="nav-icon" />
+          <span class="nav-label">{item.label}</span>
+        </a>
+      {/each}
+    </div>
+
+    <!-- Mobile hamburger button -->
+    <button
+      class="hamburger-btn"
+      onclick={() => mobileMenuOpen = !mobileMenuOpen}
+      aria-label="Toggle navigation menu"
+    >
+      <span class="hamburger-line {mobileMenuOpen ? 'open' : ''}"></span>
+      <span class="hamburger-line {mobileMenuOpen ? 'open' : ''}"></span>
+      <span class="hamburger-line {mobileMenuOpen ? 'open' : ''}"></span>
+    </button>
   </nav>
+
+  <!-- Mobile dropdown menu -->
+  {#if mobileMenuOpen}
+    <div class="mobile-menu" in:fade={{ duration: 120 }}>
+      {#each navItems as item}
+        {@const Icon = item.icon}
+        <a
+          href={item.hash}
+          class="mobile-nav-item {currentTab === item.id && !selectedProject ? 'active' : ''}"
+          onclick={closeMobileMenu}
+        >
+          <Icon size={18} class="mobile-nav-icon" />
+          <span>{item.label}</span>
+        </a>
+      {/each}
+    </div>
+  {/if}
 
   <!-- TAB CONTENT: HOME -->
   {#if currentTab === 'home' && !selectedProject}
@@ -909,6 +946,8 @@
     max-width: 100%;
     margin: 0 auto;
     box-sizing: border-box;
+    padding: 0 1.5rem;
+    position: relative;
   }
 
   /* Navigation Header at Top */
@@ -1703,11 +1742,142 @@
   }
 
   /* Mobile & Tablet Responsiveness */
-  @media (max-width: 640px) {
+  /* ═══ Mobile Navigation ═══ */
+  .hamburger-btn {
+    display: none;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
+    width: 36px;
+    height: 36px;
+    background: none;
+    border: 1px solid var(--border-color);
+    border-radius: 7px;
+    cursor: pointer;
+    padding: 8px 7px;
+    transition: border-color 0.15s ease;
+  }
+
+  .hamburger-btn:hover {
+    border-color: #52525b;
+  }
+
+  .hamburger-line {
+    display: block;
+    width: 100%;
+    height: 1.5px;
+    background: #a1a1aa;
+    border-radius: 2px;
+    transition: transform 0.25s ease, opacity 0.2s ease, background 0.15s ease;
+    transform-origin: center;
+  }
+
+  .hamburger-btn:hover .hamburger-line {
+    background: #ffffff;
+  }
+
+  .hamburger-line.open:nth-child(1) {
+    transform: translateY(6.5px) rotate(45deg);
+  }
+  .hamburger-line.open:nth-child(2) {
+    opacity: 0;
+    transform: scaleX(0);
+  }
+  .hamburger-line.open:nth-child(3) {
+    transform: translateY(-6.5px) rotate(-45deg);
+  }
+
+  .mobile-menu {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(9, 9, 11, 0.97);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--border-color);
+    padding: 5rem 1.5rem 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    z-index: 500;
+  }
+
+  .mobile-nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+    padding: 0.85rem 1rem;
+    border-radius: 8px;
+    color: var(--text-muted);
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    transition: background 0.15s ease, color 0.15s ease;
+    border: 1px solid transparent;
+  }
+
+  .mobile-nav-item.active {
+    color: var(--text-primary);
+    background: rgba(255,255,255,0.05);
+    border-color: var(--border-color);
+  }
+
+  .mobile-nav-item:hover {
+    background: rgba(255,255,255,0.06);
+    color: #ffffff;
+  }
+
+  :global(.mobile-nav-icon) {
+    opacity: 0.7;
+  }
+
+  .mobile-nav-item.active :global(.mobile-nav-icon),
+  .mobile-nav-item:hover :global(.mobile-nav-icon) {
+    opacity: 1;
+  }
+
+  /* ═══ Tablet & Mobile Responsive ═══ */
+  @media (max-width: 768px) {
+    .portfolio-container {
+      position: relative;
+      padding: 0 1.25rem;
+    }
+
+    .nav-desktop {
+      display: none;
+    }
+
+    .hamburger-btn {
+      display: flex;
+    }
+
     .nav-bar {
-      gap: 0.85rem 1rem;
-      margin-bottom: 2.5rem;
-      font-size: 0.88rem;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding: 1rem 0;
+      position: relative;
+      z-index: 600;
+    }
+
+    /* Show a small site name/brand on mobile next to hamburger */
+    .nav-bar::before {
+      content: 'th0truth';
+      font-family: var(--font-mono);
+      font-size: 0.92rem;
+      color: var(--text-primary);
+      flex: 1;
+    }
+
+    .profile-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1.25rem;
+    }
+
+    .profile-name {
+      font-size: 2.2rem;
     }
 
     .project-grid {
@@ -1718,24 +1888,6 @@
       grid-template-columns: repeat(2, 1fr);
     }
 
-    .profile-header {
-      gap: 1.25rem;
-    }
-
-    .avatar-radar-wrapper {
-      width: 92px;
-      height: 92px;
-    }
-
-    .avatar-container {
-      width: 74px;
-      height: 74px;
-    }
-
-    .profile-name {
-      font-size: 2rem;
-    }
-
     .footer-header {
       flex-direction: column;
       align-items: flex-start;
@@ -1744,6 +1896,58 @@
 
     .timeline-item {
       gap: 0.85rem;
+    }
+
+    .skills-columns {
+      grid-template-columns: 1fr;
+    }
+
+    .tab-content {
+      padding-bottom: 2rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .portfolio-container {
+      padding: 0 1rem;
+    }
+
+    .profile-name {
+      font-size: 1.8rem;
+    }
+
+    .avatar-radar-wrapper {
+      width: 88px;
+      height: 88px;
+    }
+
+    .avatar-container {
+      width: 70px;
+      height: 70px;
+    }
+
+    :global(.screenshots-group) {
+      grid-template-columns: 1fr;
+    }
+
+    .exp-title-row {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.35rem;
+    }
+
+    .project-detail-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .featured-project-row .row-desc {
+      white-space: normal;
+    }
+
+    .section-title-wrapper h2 {
+      font-size: 1.05rem;
     }
   }
 
