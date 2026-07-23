@@ -685,7 +685,7 @@
     <section class="tab-content" in:fade={{ duration: 180 }}>
       <div class="section-title-wrapper">
         <Briefcase size={20} class="section-icon" />
-        <h2>Experience</h2>
+        <h2>Work Experience</h2>
       </div>
 
       {#if loadingExp}
