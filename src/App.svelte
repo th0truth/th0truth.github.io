@@ -316,7 +316,7 @@
 
   <!-- TAB CONTENT: HOME -->
   {#if currentTab === 'home' && !selectedProject}
-    <section class="bio-section">
+    <section class="tab-content bio-section">
       <!-- Profile Avatar & Title Header with Subdued Glow Radar Ring -->
       <div class="profile-header">
         <div class="avatar-radar-wrapper">
@@ -601,8 +601,8 @@
     }
   }
   .portfolio-container {
-    max-width: 760px;
-    width: 100%;
+    width: 760px;
+    max-width: 100%;
     margin: 0 auto;
     box-sizing: border-box;
   }
@@ -810,6 +810,10 @@
     width: 2px;
     background: linear-gradient(180deg, #52525b 0%, #27272a 100%);
     z-index: 1;
+  }
+
+  .timeline-item:last-child .timeline-vertical-line {
+    bottom: 0;
   }
 
   .timeline-card {
@@ -1132,6 +1136,7 @@
 
   .tab-content {
     min-height: 260px;
+    width: 100%;
   }
 
   .status-msg {
