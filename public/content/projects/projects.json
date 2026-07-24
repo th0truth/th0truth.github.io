@@ -78,5 +78,15 @@
     "stars": 0,
     "tags": ["algorithms", "cuda", "sdl2", "cpp17"],
     "githubUrl": "https://github.com/th0truth/algorithms"
+  },
+  {
+    "slug": "kernel32",
+    "name": "kernel32",
+    "icon": "Cpu",
+    "description": "Minimal Win32 / low-level system call exploration and lightweight kernel API interface in C.",
+    "language": "C",
+    "stars": 0,
+    "tags": ["win32", "system-calls", "c", "low-level"],
+    "githubUrl": "https://github.com/th0truth/kernel32"
   }
 ]
