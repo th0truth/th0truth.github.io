@@ -102,6 +102,26 @@
   let projectDetailHtml = $state('');
   let loadingProjectDetail = $state(false);
 
+  // Programming language filtering state
+  let selectedLanguageFilter = $state('All');
+
+  let availableLanguages = $derived.by(() => {
+    const langs = new Set<string>();
+    for (const p of projects ?? []) {
+      if (p.language) {
+        langs.add(p.language);
+      }
+    }
+    return ['All', ...Array.from(langs).sort()];
+  });
+
+  let filteredProjects = $derived.by(() => {
+    if (selectedLanguageFilter === 'All') {
+      return projects;
+    }
+    return projects.filter(p => p.language === selectedLanguageFilter);
+  });
+
   // Derived: deduplicated tech stack for home page display
   let uniqueTechs = $derived.by(() => {
     const seen = new Map<string, string>();
@@ -751,8 +771,20 @@
       {:else if projects.length === 0}
         <p class="status-msg">No selected projects listed.</p>
       {:else}
+        <!-- Language Switcher/Filter -->
+        <div class="lang-filter-container">
+          {#each availableLanguages as lang}
+            <button
+              class="lang-filter-btn {selectedLanguageFilter === lang ? 'active' : ''}"
+              onclick={() => selectedLanguageFilter = lang}
+            >
+              {lang}
+            </button>
+          {/each}
+        </div>
+
         <div class="project-grid">
-          {#each projects as project}
+          {#each filteredProjects as project}
             {@const Icon = getProjectIcon(project.icon)}
             <button class="project-card" onclick={() => openProjectDetail(project)}>
               <div class="card-header">
@@ -1619,6 +1651,40 @@
     font-family: var(--font-mono);
     color: var(--text-muted);
     font-size: 0.9rem;
+  }
+
+  /* Language Filter Switcher */
+  .lang-filter-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin: 0.5rem 0 2rem 0;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .lang-filter-btn {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    padding: 0.4rem 0.85rem;
+    border-radius: 6px;
+    border: 1px solid var(--border-color);
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--text-secondary);
+    transition: all 0.15s ease;
+  }
+
+  .lang-filter-btn:hover {
+    color: var(--text-primary);
+    border-color: #52525b;
+    background: rgba(255, 255, 255, 0.05);
+  }
+
+  .lang-filter-btn.active {
+    color: #ffffff;
+    border-color: var(--text-primary);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 8px rgba(255, 255, 255, 0.04);
   }
 
   /* Selected Projects Grid */

@@ -8,7 +8,7 @@ Real-time desktop screen broadcasting and video streaming application over netwo
 - Cross-platform network streaming protocol.
 
 ## Tech Stack
-- **Python / C++**
+- **C++**
 - **Sockets & Network Programming**
 - **Video Frame Processing**
 
