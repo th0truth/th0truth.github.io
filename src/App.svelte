@@ -60,6 +60,7 @@
 
   let skillsData = $state<SkillsData>({ technical: [], soft: [] });
   let loadingSkills = $state(true);
+
   interface ProjectMeta {
     slug: string;
     name: string;
@@ -114,10 +115,13 @@
   }
 
   function syncRouteFromHash() {
-    const hash = window.location.hash || '#/';
+    let hash = (window.location.hash || '#/').toLowerCase();
+    if (hash.length > 2 && hash.endsWith('/')) {
+      hash = hash.slice(0, -1);
+    }
     activeImageOverlay = null;
 
-    if (hash === '#/' || hash === '') {
+    if (hash === '#/' || hash === '' || hash === '#') {
       currentTab = 'home';
       selectedProject = null;
       selectedProjectSlug = null;
@@ -274,30 +278,38 @@
     }
   }
 
-  // Interactive Custom Cursor State
-  let cursorX = $state(-100);
-  let cursorY = $state(-100);
-  let ringX = $state(-100);
-  let ringY = $state(-100);
+  // Interactive Custom Cursor State (optimized for 60-120fps smooth performance)
   let isHovered = $state(false);
   let isClicking = $state(false);
   let cursorVisible = $state(false);
 
   let targetX = -100;
   let targetY = -100;
+  let currentCursorX = -100;
+  let currentCursorY = -100;
+  let currentRingX = -100;
+  let currentRingY = -100;
   let animFrameId: number;
 
   function updateCursorPos(e: MouseEvent) {
-    cursorVisible = true;
+    if (!cursorVisible) cursorVisible = true;
     targetX = e.clientX;
     targetY = e.clientY;
-    cursorX = e.clientX;
-    cursorY = e.clientY;
+    currentCursorX = e.clientX;
+    currentCursorY = e.clientY;
+
+    const dotEl = document.getElementById('custom-cursor-dot');
+    if (dotEl) {
+      dotEl.style.transform = `translate3d(${currentCursorX}px, ${currentCursorY}px, 0)`;
+    }
 
     const target = e.target as HTMLElement;
     if (target) {
       const interactive = target.closest('a, button, input, textarea, [data-src], .project-card, .screenshot-item, .nav-item');
-      isHovered = !!interactive;
+      const shouldHover = !!interactive;
+      if (isHovered !== shouldHover) {
+        isHovered = shouldHover;
+      }
     }
   }
 
@@ -314,8 +326,12 @@
   }
 
   function animateRing() {
-    ringX += (targetX - ringX) * 0.18;
-    ringY += (targetY - ringY) * 0.18;
+    currentRingX += (targetX - currentRingX) * 0.22;
+    currentRingY += (targetY - currentRingY) * 0.22;
+    const ringEl = document.getElementById('custom-cursor-ring');
+    if (ringEl) {
+      ringEl.style.transform = `translate3d(${currentRingX}px, ${currentRingY}px, 0)`;
+    }
     animFrameId = requestAnimationFrame(animateRing);
   }
 
@@ -787,12 +803,12 @@
   <!-- CUSTOM ANIMATED CURSOR -->
   {#if cursorVisible}
     <div 
-      class="custom-cursor-dot {isHovered ? 'hovered' : ''} {isClicking ? 'clicking' : ''}" 
-      style="transform: translate3d({cursorX}px, {cursorY}px, 0);"
+      id="custom-cursor-dot"
+      class="custom-cursor-dot {isHovered ? 'hovered' : ''} {isClicking ? 'clicking' : ''}"
     ></div>
     <div 
-      class="custom-cursor-ring {isHovered ? 'hovered' : ''} {isClicking ? 'clicking' : ''}" 
-      style="transform: translate3d({ringX}px, {ringY}px, 0);"
+      id="custom-cursor-ring"
+      class="custom-cursor-ring {isHovered ? 'hovered' : ''} {isClicking ? 'clicking' : ''}"
     ></div>
   {/if}
 </main>
