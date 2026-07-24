@@ -1,4 +1,4 @@
-# algorithms
+# CUDA Sort
 
 High-performance C++ implementation and SDL2 visualization of classic sorting, searching, and parallel CUDA algorithms.
 

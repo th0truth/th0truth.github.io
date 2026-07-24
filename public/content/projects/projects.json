@@ -3,10 +3,10 @@
     "slug": "hwmonitor",
     "name": "hwmonitor",
     "icon": "Cpu",
-    "description": "Lightweight hardware discovery and monitoring CLI for Linux in pure C11 reading directly from /sys and /proc.",
-    "language": "C11",
+    "description": "Lightweight hardware discovery and monitoring CLI for Linux in pure C reading directly from /sys and /proc.",
+    "language": "C",
     "stars": 0,
-    "tags": ["c11", "linux-kernel", "sysfs", "groq-ai"],
+    "tags": ["c", "linux-kernel", "sysfs", "groq-ai"],
     "githubUrl": "https://github.com/th0truth/hwmonitor"
   },
   {
@@ -44,9 +44,9 @@
     "name": "screen-broadcaster",
     "icon": "Tv",
     "description": "Real-time desktop screen broadcasting and video streaming application over network sockets.",
-    "language": "Python",
+    "language": "C++",
     "stars": 0,
-    "tags": ["streaming", "sockets", "networking", "python"],
+    "tags": ["streaming", "sockets", "networking", "cpp"],
     "githubUrl": "https://github.com/th0truth/screen-broadcaster"
   },
   {
@@ -70,14 +70,14 @@
     "githubUrl": "https://github.com/th0truth/stm32-triple-adc-pwm-display"
   },
   {
-    "slug": "algorithms",
-    "name": "algorithms",
+    "slug": "cuda-sort",
+    "name": "CUDA Sort",
     "icon": "BarChart3",
     "description": "High-performance C++ sorting algorithm visualization & CUDA GPGPU benchmarking.",
     "language": "C++",
     "stars": 0,
     "tags": ["algorithms", "cuda", "sdl2", "cpp17"],
-    "githubUrl": "https://github.com/th0truth/algorithms"
+    "githubUrl": "https://github.com/th0truth/cuda-sort"
   },
   {
     "slug": "kernel32",
@@ -88,5 +88,55 @@
     "stars": 0,
     "tags": ["win32", "system-calls", "c", "low-level"],
     "githubUrl": "https://github.com/th0truth/kernel32"
+  },
+  {
+    "slug": "configuration",
+    "name": "configuration",
+    "icon": "Layers",
+    "description": "Personal dotfiles and system configurations optimized for UNIX/Linux development environments (zsh, tmux, vim, kitty, vscode, Hyprland).",
+    "language": "Shell",
+    "stars": 0,
+    "tags": ["dotfiles", "hyprland", "vim", "zsh", "tmux", "linux"],
+    "githubUrl": "https://github.com/th0truth/configuration"
+  },
+  {
+    "slug": "botwpm",
+    "name": "botwpm",
+    "icon": "Tv",
+    "description": "Automated typing bot simulating natural human keyboard inputs, custom latency delays, mistake-correction behavior, and real-time WPM calculation.",
+    "language": "Python",
+    "stars": 0,
+    "tags": ["selenium", "automation", "python", "typing-bot", "wpm"],
+    "githubUrl": "https://github.com/th0truth/botwpm"
+  },
+  {
+    "slug": "podgen",
+    "name": "PodGen",
+    "icon": "Tv",
+    "description": "RESTful API podcast generation service with LLM-assisted alternative metadata generation, external RSS episode integration, and Telegram notification updates.",
+    "language": "Python",
+    "stars": 0,
+    "tags": ["fastapi", "python", "llm", "rss-integration", "podcast"],
+    "githubUrl": "https://github.com/th0truth/podgen"
+  },
+  {
+    "slug": "podgen-fork",
+    "name": "PodGen Fork",
+    "icon": "Tv",
+    "description": "Customized fork of the original PodGen podcast episodes generator API, featuring automated LLM-based title/description generation and Telegram bot integrations.",
+    "language": "Python",
+    "stars": 0,
+    "tags": ["fastapi", "python", "llm", "telegram-bot", "podcast-generator"],
+    "githubUrl": "https://github.com/th0truth/podgen-fork"
+  },
+  {
+    "slug": "keylogger",
+    "name": "keylogger",
+    "icon": "Cpu",
+    "description": "Windows-based monitoring utility capturing global keystrokes, active window/process tracking, Caps/Shift layout transliteration, microphone recording, and PowerShell hardware enumeration.",
+    "language": "Python",
+    "stars": 0,
+    "tags": ["keylogger", "windows-api", "powershell", "multiprocessing", "security-testing"],
+    "githubUrl": "https://github.com/th0truth/keylogger"
   }
 ]
