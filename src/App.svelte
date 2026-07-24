@@ -1493,8 +1493,8 @@
     top: 1.5rem;
     right: 1.5rem;
     background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: var(--text-primary);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #ffffff;
     border-radius: 50%;
     width: 40px;
     height: 40px;
@@ -1502,7 +1502,7 @@
     justify-content: center;
     align-items: center;
     cursor: pointer;
-    transition: background 0.2s ease;
+    transition: background 0.2s ease, border-color 0.2s ease;
   }
 
   .modal-close-btn:hover {
@@ -1806,7 +1806,7 @@
     display: block;
     width: 100%;
     height: 1.5px;
-    background: #a1a1aa;
+    background: #ffffff;
     border-radius: 2px;
     transition: transform 0.25s ease, opacity 0.2s ease, background 0.15s ease;
     transform-origin: center;
@@ -1930,21 +1930,12 @@
     }
 
     .nav-bar {
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
       margin-bottom: 2rem;
       padding: 1rem 0;
       position: relative;
       z-index: 600;
-    }
-
-    /* Show a small site name/brand on mobile next to hamburger */
-    .nav-bar::before {
-      content: 'th0truth';
-      font-family: var(--font-mono);
-      font-size: 0.92rem;
-      color: var(--text-primary);
-      flex: 1;
     }
 
     .profile-header {
