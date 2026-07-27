@@ -30,16 +30,6 @@
     "githubUrl": "https://github.com/th0truth/fastapi-nosql-template"
   },
   {
-    "slug": "barnsight",
-    "name": "BarnSight",
-    "icon": "Eye",
-    "description": "Computer vision platform using edge AI & farm cameras to detect organic floor contamination for automated farm hygiene.",
-    "language": "Python",
-    "stars": 0,
-    "tags": ["opencv", "yolo", "edge-ai", "fastapi", "computer-vision"],
-    "githubUrl": "https://github.com/barnsight"
-  },
-  {
     "slug": "screen-broadcaster",
     "name": "screen-broadcaster",
     "icon": "Tv",
@@ -56,7 +46,7 @@
     "description": "Fast C/C++ utility for converting numbers across binary, octal, decimal, and hexadecimal bases.",
     "language": "C++",
     "stars": 0,
-    "tags": ["converter", "algorithms", "cpp", "cli"],
+    "tags": ["converter", "algorithms", "cli"],
     "githubUrl": "https://github.com/th0truth/numeral-system-converter"
   },
   {
@@ -86,7 +76,7 @@
     "description": "Minimal Win32 / low-level system call exploration and lightweight kernel API interface in C.",
     "language": "C",
     "stars": 0,
-    "tags": ["win32", "system-calls", "c", "low-level"],
+    "tags": ["win32", "system-calls", "low-level"],
     "githubUrl": "https://github.com/th0truth/kernel32"
   },
   {
@@ -138,5 +128,15 @@
     "stars": 0,
     "tags": ["keylogger", "windows-api", "powershell", "multiprocessing", "security-testing"],
     "githubUrl": "https://github.com/th0truth/keylogger"
+  },
+  {
+    "slug": "barnsight",
+    "name": "BarnSight",
+    "icon": "Eye",
+    "description": "Computer vision platform using edge AI & farm cameras to detect organic floor contamination for automated farm hygiene.",
+    "language": "Python",
+    "stars": 0,
+    "tags": ["opencv", "yolo", "edge-ai", "fastapi", "computer-vision"],
+    "githubUrl": "https://github.com/barnsight"
   }
 ]

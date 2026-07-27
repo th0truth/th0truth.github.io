@@ -21,3 +21,4 @@ Type-safe, fully asynchronous FastAPI template for NoSQL-based applications with
 - REST & GraphQL support
 - Rate limiting
 - Monitoring-ready setup
+- Follow PEP 8 style

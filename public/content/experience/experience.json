@@ -7,6 +7,6 @@
     "botUrl": "https://t.me/olx_search_notifications_bot",
     "botName": "@olx_search_notifications_bot",
     "botDesc": "Пошук квартир в оренду",
-    "techStack": ["Python", "Telethon", "Aiogram", "Docker", "MongoDB", "Redis"]
+    "techStack": ["Python", "Telethon", "Beautiful Soup 4", "Aiogram", "Docker", "MongoDB", "Redis"]
   }
 ]
