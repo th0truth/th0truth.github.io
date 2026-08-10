@@ -19,8 +19,8 @@
   // Navigation Items
   const navItems = [
     { key: 'h', label: 'home', id: 'home', hash: '#/', icon: Home },
-    { key: 's', label: 'skills', id: 'skills', hash: '#/skills', icon: Layers },
     { key: 'e', label: 'experience', id: 'experience', hash: '#/experience', icon: Briefcase },
+    { key: 's', label: 'skills', id: 'skills', hash: '#/skills', icon: Layers },
     { key: 'p', label: 'projects', id: 'projects', hash: '#/projects', icon: FolderGit2 }
   ];
 
@@ -529,7 +529,7 @@
           <p class="status-msg">Loading...</p>
         {:else if experiences.length > 0}
           {#each experiences as exp}
-            <div class="exp-preview-card">
+            <a href="#/experience" class="exp-preview-card">
               <div class="exp-title-row">
                 <h3 class="exp-role">{exp.role}</h3>
                 <span class="badge-freelance">{exp.type}</span>
@@ -542,7 +542,7 @@
                   {/each}
                 </div>
               {/if}
-            </div>
+            </a>
           {/each}
           <a href="#/experience" class="show-more-link">
             Show More
@@ -2129,12 +2129,16 @@
 
   /* Experience Preview Card */
   .exp-preview-card {
+    display: block;
+    text-decoration: none;
+    color: inherit;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
     padding: 1rem 1.25rem;
     border-radius: 8px;
     margin-bottom: 0.65rem;
     transition: border-color 0.25s ease, transform 0.25s ease;
+    cursor: pointer;
   }
 
   .exp-preview-card:hover {
