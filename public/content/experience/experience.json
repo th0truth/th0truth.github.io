@@ -3,10 +3,10 @@
     "slug": "python-developer",
     "role": "Python Developer",
     "type": "Freelance",
-    "period": "Jun 2026 – Jul 2026",
+    "period": "June 2026 – Present",
     "botUrl": "https://t.me/olx_search_notifications_bot",
     "botName": "@olx_search_notifications_bot",
     "botDesc": "Пошук квартир в оренду",
-    "techStack": ["Python", "Telethon", "Beautiful Soup 4", "Aiogram", "Docker", "MongoDB", "Redis"]
+    "techStack": ["Python", "Telethon", "Aiogram", "Beautiful Soup 4", "MongoDB", "Redis", "Docker"]
   }
 ]

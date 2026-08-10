@@ -2,11 +2,13 @@
 *June 2026 – Present*
 
 **Bot:** [@olx_search_notifications_bot](https://t.me/olx_search_notifications_bot) *(Пошук квартир в оренду)*
-**Tech Stack:** Python, Telethon, Aiogram, Docker, MongoDB, Redis
+**Tech Stack:** Python, Telethon, Aiogram, Beautiful Soup 4, MongoDB, Redis, Docker
 
 - Built asynchronous Telegram listing parsers using **Telethon**.
 - Developed interactive notification bot with **Aiogram**.
-- Implemented duplicate & noise filtering logic for listings.
-- Optimized media processing via in-memory image downloads (zero disk I/O).
-- Integrated **Redis** caching & background processing.
-- Containerized deployment with **Docker**.
+- Integrated **Redis** caching and background task processing.
+- Designed media processing through in-memory image downloads, eliminating unnecessary disk I/O.
+- Implemented cron-based scheduled notifications for discounted rental listings.
+- Implemented duplicate & noise filtering logic for rental listings.
+- Conducted code reviews and refactoring to improve code quality and reliability.
+- Containerized the bot and deployment workflow with **Docker**.
