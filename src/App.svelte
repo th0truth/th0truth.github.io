@@ -503,10 +503,6 @@
         <div class="profile-titles">
           <h1 class="profile-name">Vladyslav Panasiuk</h1>
           <p class="profile-handle">@th0truth · <span class="profile-role">software engineer</span></p>
-          <div class="availability-badge">
-            <span class="availability-dot"></span>
-            <span>Open to work</span>
-          </div>
         </div>
       </div>
 
