@@ -583,50 +583,12 @@
         {/if}
       </div>
 
-      <!-- Technical & Soft Skills Summary (Concise) -->
-      <div class="home-section-block">
-        <div class="section-title-wrapper">
-          <span class="section-bar"></span>
-          <h2>skills</h2>
-        </div>
-        <div class="home-skills-summary">
-          <div class="skills-summary-group">
-            <span class="skills-summary-label">Primary Languages & Backend:</span>
-            <div class="tech-stack-grid">
-              <span class="tech-pill highlight">Python</span>
-              <span class="tech-pill highlight">C</span>
-              <span class="tech-pill highlight">C++</span>
-              <span class="tech-pill">FastAPI</span>
-              <span class="tech-pill">Flask</span>
-              <span class="tech-pill">REST APIs</span>
-              <span class="tech-pill">Docker</span>
-              <span class="tech-pill">MongoDB</span>
-              <span class="tech-pill">Redis</span>
-            </div>
-          </div>
-          <div class="skills-summary-group">
-            <span class="skills-summary-label">Domains & Highlights:</span>
-            <div class="tech-stack-grid">
-              <span class="tech-pill">Embedded (STM32 / ESP32)</span>
-              <span class="tech-pill">Computer Vision (YOLO / OpenCV)</span>
-              <span class="tech-pill">Linux Systems</span>
-              <span class="tech-pill soft-pill">Leadership</span>
-              <span class="tech-pill soft-pill">Problem-Solving</span>
-              <span class="tech-pill soft-pill">Teamwork</span>
-            </div>
-          </div>
-        </div>
-        <a href="#/skills" class="show-more-link">
-          Show All Skills
-          <ChevronRight size={14} />
-        </a>
-      </div>
 
       <!-- Featured Projects -->
       <div class="home-section-block">
         <div class="section-title-wrapper">
           <span class="section-bar"></span>
-          <h2>projects</h2>
+          <h2>selected projects</h2>
         </div>
         {#if loadingProjects}
           <p class="status-msg">Loading...</p>
@@ -1879,20 +1841,23 @@
     word-break: break-word;
   }
 
-  .tags {
+  .tags,
+  .exp-preview-tags {
     display: flex;
     flex-wrap: wrap;
     gap: 0.35rem;
     font-family: var(--font-mono);
-    font-size: 0.78rem;
+    font-size: 0.82rem;
     color: var(--text-secondary);
     max-width: 100%;
   }
 
   .tag-primary {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
     color: var(--text-primary);
     border: 1px solid var(--border-color);
-    padding: 0.15rem 0.45rem;
+    padding: 0.15rem 0.48rem;
     border-radius: 4px;
     background: rgba(255, 255, 255, 0.03);
     max-width: 100%;
@@ -1901,9 +1866,11 @@
   }
 
   .tag-item {
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
     color: var(--text-secondary);
     border: 1px solid var(--border-color);
-    padding: 0.15rem 0.45rem;
+    padding: 0.15rem 0.48rem;
     border-radius: 4px;
     background: rgba(255, 255, 255, 0.015);
     max-width: 100%;
@@ -2178,17 +2145,14 @@
     }
 
     .tag-item, .tag-primary {
-      font-size: 0.78rem;
-      padding: 0.15rem 0.45rem;
+      font-size: 0.82rem;
+      padding: 0.15rem 0.48rem;
     }
 
     .show-more-link {
       font-size: 0.9rem;
     }
 
-    .skills-summary-label {
-      font-size: 0.88rem;
-    }
 
     .tech-pill {
       font-size: 0.82rem;
@@ -2391,7 +2355,7 @@
     }
 
     .tag-item, .tag-primary {
-      font-size: 0.76rem;
+      font-size: 0.78rem;
       padding: 0.12rem 0.42rem;
     }
 
@@ -2399,9 +2363,6 @@
       font-size: 0.86rem;
     }
 
-    .skills-summary-label {
-      font-size: 0.85rem;
-    }
 
     .tech-pill {
       font-size: 0.8rem;
@@ -2522,9 +2483,6 @@
   }
 
   .exp-preview-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem;
     margin-top: 0.55rem;
   }
 
@@ -2571,32 +2529,7 @@
     font-weight: 500;
   }
 
-  .tech-pill.soft-pill {
-    color: #a1a1aa;
-    border-style: dashed;
-  }
 
-  .home-skills-summary {
-    display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    padding: 1.15rem;
-    border-radius: 8px;
-  }
-
-  .skills-summary-group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-  }
-
-  .skills-summary-label {
-    font-family: var(--font-mono);
-    font-size: 0.88rem;
-    color: var(--text-muted);
-  }
 
   /* Skills Dedicated Page Styles */
   .skills-category-block {
