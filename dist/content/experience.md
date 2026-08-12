@@ -1,5 +1,5 @@
 ## Python Developer *(Freelance)*
-*Jun – Jul 2026*
+*June 2026 – Present*
 
 **Bot:** [@olx_search_notifications_bot](https://t.me/olx_search_notifications_bot) *(Пошук квартир в оренду)*
 **Tech Stack:** Python, Telethon, Aiogram, Beautiful Soup 4, MongoDB, Redis, Docker

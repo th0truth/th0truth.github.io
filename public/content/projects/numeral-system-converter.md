@@ -8,6 +8,6 @@ Fast utility for converting numbers between binary, octal, decimal, hexadecimal,
 - Clean CLI interface.
 
 ## Tech Stack
-- **C / C++**
+- **C**
 - **Bitwise Algorithms**
 

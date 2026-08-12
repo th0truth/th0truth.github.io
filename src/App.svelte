@@ -314,6 +314,38 @@
     window.location.hash = '#/projects';
   }
 
+  function getProjectTags(project: ProjectMeta): string[] {
+    if (!project || !project.tags) return [];
+    const lang = (project.language || '').toLowerCase().trim();
+    const seen = new Set<string>();
+    if (lang) {
+      seen.add(lang);
+      if (lang === 'c++') {
+        seen.add('cpp');
+        seen.add('cpp17');
+        seen.add('cpp20');
+        seen.add('c++17');
+        seen.add('c++20');
+      } else if (lang === 'c') {
+        seen.add('c');
+      } else if (lang === 'python') {
+        seen.add('python');
+        seen.add('py');
+      } else if (lang === 'shell') {
+        seen.add('shell');
+      }
+    }
+    const result: string[] = [];
+    for (const t of project.tags) {
+      const lower = t.toLowerCase().trim();
+      if (!seen.has(lower)) {
+        seen.add(lower);
+        result.push(t);
+      }
+    }
+    return result;
+  }
+
   function handleContainerClick(e: MouseEvent) {
     const target = e.target as HTMLElement;
     const item = target.closest('.screenshot-item') as HTMLElement;
@@ -408,6 +440,7 @@
     window.addEventListener('mousemove', updateCursorPos);
     window.addEventListener('mousedown', handleMouseDown);
     window.addEventListener('mouseup', handleMouseUp);
+    window.addEventListener('click', handleContainerClick);
     document.addEventListener('mouseleave', handleMouseLeave);
 
     return () => {
@@ -418,12 +451,13 @@
       window.removeEventListener('mousemove', updateCursorPos);
       window.removeEventListener('mousedown', handleMouseDown);
       window.removeEventListener('mouseup', handleMouseUp);
+      window.removeEventListener('click', handleContainerClick);
       document.removeEventListener('mouseleave', handleMouseLeave);
     };
   });
 </script>
 
-<main class="portfolio-container" onclick={handleContainerClick}>
+<main class="portfolio-container">
   <!-- Top Navigation Header -->
   <nav class="nav-bar">
     <!-- Desktop nav items -->
@@ -518,19 +552,21 @@
       <!-- Work Experience Preview -->
       <div class="home-section-block" style="margin-top: 3.5rem;">
         <div class="section-title-wrapper">
-          <Briefcase size={18} class="section-icon" />
-          <h2>Work Experience</h2>
+          <span class="section-bar"></span>
+          <h2>experience</h2>
         </div>
         {#if loadingExp}
           <p class="status-msg">Loading...</p>
         {:else if experiences.length > 0}
           {#each experiences as exp}
             <a href="#/experience" class="exp-preview-card">
-              <div class="exp-title-row">
-                <h3 class="exp-role">{exp.role}</h3>
-                <span class="badge-freelance">{exp.type}</span>
+              <div class="exp-header-row">
+                <div class="exp-title-row">
+                  <h3 class="exp-role">{exp.role}</h3>
+                  <span class="badge-freelance">{exp.type}</span>
+                </div>
+                <div class="exp-period">{exp.period}</div>
               </div>
-              <div class="exp-period">{exp.period}</div>
               {#if exp.techStack && exp.techStack.length > 0}
                 <div class="exp-preview-tags">
                   {#each exp.techStack as tech}
@@ -550,8 +586,8 @@
       <!-- Technical & Soft Skills Summary (Concise) -->
       <div class="home-section-block">
         <div class="section-title-wrapper">
-          <Layers size={18} class="section-icon" />
-          <h2>Technical & Soft Skills</h2>
+          <span class="section-bar"></span>
+          <h2>skills</h2>
         </div>
         <div class="home-skills-summary">
           <div class="skills-summary-group">
@@ -589,8 +625,8 @@
       <!-- Featured Projects -->
       <div class="home-section-block">
         <div class="section-title-wrapper">
-          <FolderGit2 size={18} class="section-icon" />
-          <h2>Featured Projects</h2>
+          <span class="section-bar"></span>
+          <h2>projects</h2>
         </div>
         {#if loadingProjects}
           <p class="status-msg">Loading...</p>
@@ -601,7 +637,7 @@
               <button class="featured-project-row" onclick={() => openProjectDetail(project)}>
                 <div class="row-left">
                   <div class="row-header">
-                    <Icon size={15} class="card-title-icon" />
+                    <Icon size={16} class="card-title-icon" />
                     <span class="row-title">{project.name}</span>
                     {#if project.language}
                       <span class="tag-primary compact">{project.language}</span>
@@ -626,8 +662,8 @@
   {:else if currentTab === 'skills' && !selectedProject}
     <section class="tab-content" in:fade={{ duration: 180 }}>
       <div class="section-title-wrapper">
-        <Layers size={20} class="section-icon" />
-        <h2>Skills & Expertise</h2>
+        <span class="section-bar"></span>
+        <h2>skills</h2>
       </div>
 
       {#if loadingSkills}
@@ -635,7 +671,10 @@
       {:else}
         <!-- Technical Skills with Timeline Nodes & Vertical Lines -->
         <div class="skills-category-block">
-          <h3 class="skills-cat-header">Technical Skills</h3>
+          <h3 class="skills-cat-header">
+            <span class="section-bar"></span>
+            <span>technical skills</span>
+          </h3>
 
           <div class="timeline-list">
             {#each (skillsData?.technical ?? []) as group}
@@ -681,7 +720,10 @@
 
         <!-- Soft Skills Section -->
         <div class="skills-category-block" style="margin-top: 3.5rem;">
-          <h3 class="skills-cat-header">Soft Skills</h3>
+          <h3 class="skills-cat-header">
+            <span class="section-bar"></span>
+            <span>soft skills</span>
+          </h3>
           <div class="soft-skills-grid">
             {#each (skillsData?.soft ?? []) as soft}
               <div class="soft-skill-card">
@@ -700,8 +742,8 @@
   {:else if currentTab === 'experience' && !selectedProject}
     <section class="tab-content" in:fade={{ duration: 180 }}>
       <div class="section-title-wrapper">
-        <Briefcase size={20} class="section-icon" />
-        <h2>Work Experience</h2>
+        <span class="section-bar"></span>
+        <h2>experience</h2>
       </div>
 
       {#if loadingExp}
@@ -720,11 +762,13 @@
 
               <!-- Right Content Block with Tight Elegant Typography -->
               <div class="timeline-card">
-                <div class="exp-title-row">
-                  <h3 class="exp-role">{exp.role}</h3>
-                  <span class="badge-freelance">{exp.type}</span>
+                <div class="exp-header-row">
+                  <div class="exp-title-row">
+                    <h3 class="exp-role">{exp.role}</h3>
+                    <span class="badge-freelance">{exp.type}</span>
+                  </div>
+                  <div class="exp-period">{exp.period}</div>
                 </div>
-                <div class="exp-period">{exp.period}</div>
 
                 {#if exp.botUrl}
                   <div class="exp-meta-line">
@@ -758,8 +802,8 @@
   {:else if currentTab === 'projects' && !selectedProject}
     <section class="tab-content" in:fade={{ duration: 180 }}>
       <div class="section-title-wrapper">
-        <FolderGit2 size={20} class="section-icon" />
-        <h2>Selected Projects</h2>
+        <span class="section-bar"></span>
+        <h2>projects</h2>
       </div>
       
       {#if loadingProjects}
@@ -797,7 +841,7 @@
                 {#if project.language}
                   <span class="tag-primary">{project.language}</span>
                 {/if}
-                {#each project.tags as tag}
+                {#each getProjectTags(project) as tag}
                   <span class="tag-item">{tag}</span>
                 {/each}
               </div>
@@ -836,9 +880,12 @@
   <!-- Footer Links Section -->
   <footer class="footer-section">
     <div class="footer-header">
-      <h2 class="footer-title">Find me here ~</h2>
+      <h2 class="footer-title">
+        <span class="section-bar"></span>
+        <span>find me here ~</span>
+      </h2>
       <div class="time-wrapper">
-        <Clock size={13} class="clock-icon" />
+        <Clock size={14} class="clock-icon" />
         <span class="time-display">{currentTime}</span>
       </div>
     </div>
@@ -876,10 +923,18 @@
 
   <!-- FULLSCREEN IMAGE OVERLAY MODAL -->
   {#if activeImageOverlay}
-    <div class="image-modal-overlay" onclick={() => activeImageOverlay = null}>
-      <button class="modal-close-btn" onclick={() => activeImageOverlay = null}>
+    <div
+      class="image-modal-overlay"
+      role="button"
+      tabindex="0"
+      onclick={() => activeImageOverlay = null}
+      onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ' || e.key === 'Escape') activeImageOverlay = null; }}
+    >
+      <button class="modal-close-btn" onclick={() => activeImageOverlay = null} aria-label="Close enlarged image">
         <X size={20} />
       </button>
+      <!-- svelte-ignore a11y_no_static_element_interactions -->
+      <!-- svelte-ignore a11y_click_events_have_key_events -->
       <div class="modal-content-wrapper" onclick={(e) => e.stopPropagation()}>
         <img src={activeImageOverlay} alt="Enlarged screenshot preview" class="modal-img" />
       </div>
@@ -1294,22 +1349,32 @@
     gap: 0.25rem;
   }
 
+  .exp-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    gap: 0.75rem;
+    margin-bottom: 0.35rem;
+  }
+
   .exp-title-row {
     display: flex;
     align-items: center;
     gap: 0.6rem;
+    flex-wrap: wrap;
   }
 
   .exp-role {
-    font-size: 1.25rem;
+    font-size: 1.22rem;
     font-weight: 600;
     color: var(--text-primary);
-    line-height: 1.2;
+    line-height: 1.25;
   }
 
   .badge-freelance {
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: 0.76rem;
     color: var(--text-secondary);
     background: rgba(255, 255, 255, 0.04);
     border: 1px solid var(--border-color);
@@ -1319,19 +1384,23 @@
 
   .exp-period {
     font-family: var(--font-mono);
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     color: var(--text-muted);
-    margin-bottom: 0.35rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    white-space: nowrap;
+    text-align: right;
+    margin-left: auto;
   }
 
   .exp-meta-line {
-    font-size: 0.92rem;
+    font-size: 0.96rem;
     color: var(--text-secondary);
     display: flex;
     flex-wrap: wrap;
     gap: 0.35rem;
     align-items: center;
-    line-height: 1.4;
+    line-height: 1.5;
   }
 
   .meta-label {
@@ -1344,25 +1413,28 @@
     text-decoration: underline;
     text-underline-offset: 3px;
     font-family: var(--font-mono);
-    font-size: 0.88rem;
+    font-size: 0.94rem;
   }
 
   .bot-desc {
     color: var(--text-muted);
     font-style: italic;
-    font-size: 0.88rem;
+    font-size: 0.92rem;
   }
 
   .tech-line {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.45rem;
   }
 
   .tech-val {
     color: var(--text-secondary);
+    font-size: 0.94rem;
   }
 
   .exp-bullets {
-    margin-top: 0.25rem;
+    margin-top: 0.35rem;
+    font-size: 0.98rem;
+    line-height: 1.65;
   }
 
   /* Bio & Markdown Content Styling */
@@ -1370,44 +1442,62 @@
     display: flex;
     flex-direction: column;
     color: var(--text-secondary);
-    font-size: 1rem;
-    line-height: 1.65;
+    font-size: 1.02rem;
+    line-height: 1.7;
   }
 
   :global(.markdown-content p) {
-    margin-bottom: 0.85rem;
+    margin-bottom: 0.95rem;
   }
 
   :global(.markdown-content p:last-child) {
     margin-bottom: 0;
   }
 
+  :global(.markdown-content ul) {
+    margin-left: 1.35rem;
+    padding-left: 0.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin-bottom: 0.85rem;
+  }
+
+  :global(.markdown-content li) {
+    padding-left: 0.25rem;
+  }
+
   :global(.project-detail-body h1) {
     color: var(--text-primary);
-    font-size: 2.2rem;
+    font-size: 1.75rem;
     font-weight: 600;
-    margin-bottom: 1.25rem;
-    line-height: 1.2;
+    margin-bottom: 1.1rem;
+    line-height: 1.25;
   }
 
   :global(.project-detail-body h2) {
     color: var(--text-primary);
-    font-size: 1.35rem;
+    font-size: 1.22rem;
     font-weight: 600;
-    margin-top: 1.75rem;
+    margin-top: 1.65rem;
     margin-bottom: 0.75rem;
   }
 
   :global(.project-detail-body p) {
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.2rem;
+    font-size: 1.02rem;
+    line-height: 1.7;
   }
 
   :global(.project-detail-body ul) {
-    margin-left: 1.25rem;
+    margin-left: 1.35rem;
+    padding-left: 0.25rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.35rem;
+    font-size: 0.98rem;
+    line-height: 1.65;
   }
 
   :global(.markdown-content strong) {
@@ -1489,7 +1579,7 @@
 
   :global(.screenshot-item figcaption) {
     font-family: var(--font-mono);
-    font-size: 0.72rem;
+    font-size: 0.78rem;
     color: var(--text-muted);
     text-align: center;
     padding-top: 0.15rem;
@@ -1564,9 +1654,27 @@
   .section-title-wrapper {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    margin-bottom: 1.5rem;
+    gap: 0.65rem;
+    margin-bottom: 1.35rem;
     color: var(--text-primary);
+  }
+
+  .section-bar {
+    display: inline-block;
+    width: 18px;
+    height: 2px;
+    background: var(--text-primary);
+    border-radius: 1px;
+    flex-shrink: 0;
+    opacity: 0.85;
+  }
+
+  .section-title-wrapper h2 {
+    font-size: 1.35rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    line-height: 1.2;
+    letter-spacing: -0.01em;
   }
 
   :global(.section-icon) {
@@ -1585,12 +1693,16 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 1.75rem;
+    margin-bottom: 1.5rem;
   }
 
   .footer-title {
-    font-size: 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 1.2rem;
     font-weight: 500;
+    color: var(--text-primary);
   }
 
   .time-wrapper {
@@ -1602,23 +1714,23 @@
 
   .time-display {
     font-family: var(--font-mono);
-    font-size: 0.85rem;
+    font-size: 0.86rem;
   }
 
   .links-grid {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 2rem 1.5rem;
+    gap: 1.75rem 1.5rem;
   }
 
   .link-item {
     display: flex;
     flex-direction: column;
-    gap: 0.3rem;
+    gap: 0.25rem;
   }
 
   .link-label {
-    font-size: 0.95rem;
+    font-size: 0.98rem;
     color: var(--text-primary);
   }
 
@@ -1627,7 +1739,7 @@
     align-items: center;
     gap: 0.4rem;
     font-family: var(--font-mono);
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: var(--text-secondary);
     text-decoration: underline;
     text-underline-offset: 3px;
@@ -1646,23 +1758,23 @@
   .status-msg {
     font-family: var(--font-mono);
     color: var(--text-muted);
-    font-size: 0.9rem;
+    font-size: 0.92rem;
   }
 
   /* Language Filter Switcher */
   .lang-filter-container {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    margin: 0.5rem 0 2rem 0;
+    gap: 0.45rem;
+    margin: 0.5rem 0 1.75rem 0;
     padding-bottom: 0.75rem;
     border-bottom: 1px solid var(--border-color);
   }
 
   .lang-filter-btn {
     font-family: var(--font-mono);
-    font-size: 0.8rem;
-    padding: 0.4rem 0.85rem;
+    font-size: 0.85rem;
+    padding: 0.35rem 0.8rem;
     border-radius: 6px;
     border: 1px solid var(--border-color);
     background: rgba(255, 255, 255, 0.02);
@@ -1687,7 +1799,7 @@
   .project-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.25rem;
+    gap: 1.15rem;
     width: 100%;
     max-width: 100%;
   }
@@ -1741,9 +1853,10 @@
   }
 
   .card-header h3 {
-    font-size: 1.1rem;
+    font-size: 1.08rem;
     color: var(--text-primary);
     font-family: var(--font-mono);
+    font-weight: 600;
     overflow-wrap: break-word;
     word-break: break-word;
     min-width: 0;
@@ -1752,16 +1865,16 @@
 
   .stars {
     font-family: var(--font-mono);
-    font-size: 0.8rem;
+    font-size: 0.82rem;
     color: var(--text-secondary);
     flex-shrink: 0;
   }
 
   .project-card p {
-    font-size: 0.9rem;
+    font-size: 0.98rem;
     color: var(--text-secondary);
-    margin-bottom: 1rem;
-    line-height: 1.5;
+    margin-bottom: 0.95rem;
+    line-height: 1.6;
     overflow-wrap: break-word;
     word-break: break-word;
   }
@@ -1769,9 +1882,9 @@
   .tags {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.4rem;
+    gap: 0.35rem;
     font-family: var(--font-mono);
-    font-size: 0.75rem;
+    font-size: 0.78rem;
     color: var(--text-secondary);
     max-width: 100%;
   }
@@ -1802,7 +1915,7 @@
   .project-detail-section {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1.35rem;
   }
 
   .detail-top-bar {
@@ -1819,6 +1932,7 @@
     align-items: center;
     gap: 0.4rem;
     color: var(--text-secondary);
+    font-size: 0.94rem;
     transition: color 0.15s ease;
   }
 
@@ -1832,10 +1946,10 @@
     gap: 0.4rem;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    padding: 0.4rem 0.8rem;
+    padding: 0.35rem 0.75rem;
     border-radius: 6px;
     color: var(--text-primary);
-    font-size: 0.85rem;
+    font-size: 0.88rem;
     transition: border-color 0.2s ease;
   }
 
@@ -1895,16 +2009,16 @@
     background: #18181c;
     border: 1px solid var(--border-color);
     border-radius: 6px;
-    padding: 0.75rem 1rem;
+    padding: 0.85rem 1.1rem;
     font-family: var(--font-mono);
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     white-space: pre-wrap;
     word-break: break-all;
   }
 
   :global(.markdown-content code) {
     font-family: var(--font-mono);
-    font-size: 0.85em;
+    font-size: 0.88em;
     background: rgba(255, 255, 255, 0.05);
     padding: 0.15em 0.35em;
     border-radius: 4px;
@@ -1946,7 +2060,7 @@
     display: flex;
     align-items: center;
     gap: 0.9rem;
-    padding: 0.85rem 1rem;
+    padding: 0.85rem 1.1rem;
     border-radius: 8px;
     color: var(--text-muted);
     text-decoration: none;
@@ -1995,9 +2109,14 @@
       justify-content: flex-end;
       align-items: center;
       margin-bottom: 2rem;
-      padding: 1rem 0;
+      padding: 0.5rem 0;
       position: relative;
       z-index: 600;
+    }
+
+    .mobile-nav-item {
+      font-size: 1.05rem;
+      padding: 0.9rem 1.15rem;
     }
 
     .profile-header {
@@ -2010,12 +2129,147 @@
       font-size: 2.2rem;
     }
 
+    .profile-handle, .profile-role {
+      font-size: 0.98rem;
+    }
+
+    .markdown-content, .bio-text {
+      font-size: 1.02rem;
+      line-height: 1.7;
+    }
+
+    .section-title-wrapper h2 {
+      font-size: 1.35rem;
+    }
+
+    .section-bar {
+      width: 18px;
+      height: 2px;
+    }
+
+    .skills-cat-header {
+      font-size: 1.18rem;
+    }
+
+    .exp-role {
+      font-size: 1.20rem;
+    }
+
+    .badge-freelance {
+      font-size: 0.76rem;
+      padding: 0.15rem 0.48rem;
+    }
+
+    .exp-period {
+      font-size: 0.88rem;
+    }
+
+    .exp-meta-line {
+      font-size: 0.95rem;
+    }
+
+    .bot-link, .bot-desc, .tech-val {
+      font-size: 0.92rem;
+    }
+
+    .exp-bullets {
+      font-size: 0.98rem;
+      line-height: 1.65;
+    }
+
+    .tag-item, .tag-primary {
+      font-size: 0.78rem;
+      padding: 0.15rem 0.45rem;
+    }
+
+    .show-more-link {
+      font-size: 0.9rem;
+    }
+
+    .skills-summary-label {
+      font-size: 0.88rem;
+    }
+
+    .tech-pill {
+      font-size: 0.82rem;
+      padding: 0.2rem 0.55rem;
+    }
+
+    .skill-group-title {
+      font-size: 1.06rem;
+    }
+
+    .sub-label {
+      font-size: 0.88rem;
+    }
+
+    .soft-skill-icon {
+      font-size: 1.25rem;
+    }
+
+    .soft-skill-title {
+      font-size: 1.02rem;
+    }
+
+    .soft-skill-desc {
+      font-size: 0.94rem;
+      line-height: 1.55;
+    }
+
+    .featured-project-row {
+      padding: 0.95rem 1.2rem;
+    }
+
+    .featured-project-row .row-title {
+      font-size: 1.02rem;
+    }
+
+    .featured-project-row .row-desc {
+      font-size: 0.94rem;
+    }
+
+    .lang-filter-btn {
+      font-size: 0.88rem;
+      padding: 0.38rem 0.85rem;
+    }
+
     .project-grid {
       grid-template-columns: 1fr;
     }
 
+    .project-card {
+      padding: 1.25rem;
+    }
+
+    .project-card .card-header h3 {
+      font-size: 1.08rem;
+    }
+
+    .stars {
+      font-size: 0.82rem;
+    }
+
+    .project-card p {
+      font-size: 0.98rem;
+      line-height: 1.6;
+    }
+
     :global(.screenshots-group) {
       grid-template-columns: repeat(2, 1fr);
+    }
+
+    :global(.screenshot-item figcaption) {
+      font-size: 0.78rem;
+      padding: 0.2rem 0;
+    }
+
+    .back-btn {
+      font-size: 0.94rem;
+    }
+
+    .github-btn {
+      font-size: 0.88rem;
+      padding: 0.35rem 0.75rem;
     }
 
     .footer-header {
@@ -2024,12 +2278,28 @@
       gap: 0.5rem;
     }
 
-    .timeline-item {
-      gap: 0.85rem;
+    .footer-title {
+      font-size: 1.18rem;
     }
 
-    .skills-columns {
-      grid-template-columns: 1fr;
+    .time-display {
+      font-size: 0.86rem;
+    }
+
+    .link-label {
+      font-size: 0.98rem;
+    }
+
+    .link-url {
+      font-size: 0.9rem;
+    }
+
+    .timeline-line-col {
+      display: none;
+    }
+
+    .timeline-item {
+      gap: 0;
     }
 
     .tab-content {
@@ -2043,7 +2313,11 @@
     }
 
     .profile-name {
-      font-size: 1.8rem;
+      font-size: 1.95rem;
+    }
+
+    .profile-handle, .profile-role {
+      font-size: 0.94rem;
     }
 
     .avatar-radar-wrapper {
@@ -2056,63 +2330,168 @@
       height: 70px;
     }
 
-    :global(.screenshots-group) {
-      grid-template-columns: 1fr;
+    .markdown-content, .bio-text {
+      font-size: 0.98rem;
+      line-height: 1.65;
+    }
+
+    .section-title-wrapper h2 {
+      font-size: 1.3rem;
+    }
+
+    .section-bar {
+      width: 16px;
+      height: 2px;
+    }
+
+    .skills-cat-header {
+      font-size: 1.14rem;
+    }
+
+    .exp-header-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 0.5rem;
     }
 
     .exp-title-row {
       flex-direction: column;
       align-items: flex-start;
-      gap: 0.35rem;
+      gap: 0.25rem;
     }
 
-    .project-detail-header {
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 0.75rem;
+    .exp-role {
+      font-size: 1.16rem;
+    }
+
+    .badge-freelance {
+      font-size: 0.74rem;
+      padding: 0.12rem 0.42rem;
+    }
+
+    .exp-period {
+      font-size: 0.78rem;
+      text-align: right;
+      white-space: nowrap;
+      margin-top: 0.15rem;
+    }
+
+    .exp-meta-line {
+      font-size: 0.92rem;
+    }
+
+    .bot-link, .bot-desc, .tech-val {
+      font-size: 0.9rem;
+    }
+
+    .exp-bullets {
+      font-size: 0.94rem;
+      line-height: 1.6;
+    }
+
+    .tag-item, .tag-primary {
+      font-size: 0.76rem;
+      padding: 0.12rem 0.42rem;
+    }
+
+    .show-more-link {
+      font-size: 0.86rem;
+    }
+
+    .skills-summary-label {
+      font-size: 0.85rem;
+    }
+
+    .tech-pill {
+      font-size: 0.8rem;
+      padding: 0.18rem 0.5rem;
+    }
+
+    .soft-skills-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .soft-skill-title {
+      font-size: 0.98rem;
+    }
+
+    .soft-skill-desc {
+      font-size: 0.90rem;
+      line-height: 1.5;
     }
 
     .featured-project-row .row-desc {
       white-space: normal;
+      font-size: 0.90rem;
     }
 
-    .section-title-wrapper h2 {
-      font-size: 1.05rem;
+    .featured-project-row .row-title {
+      font-size: 0.98rem;
+    }
+
+    .lang-filter-btn {
+      font-size: 0.84rem;
+      padding: 0.35rem 0.8rem;
+    }
+
+    .project-card .card-header h3 {
+      font-size: 1.04rem;
+    }
+
+    .project-card p {
+      font-size: 0.95rem;
+      line-height: 1.55;
+    }
+
+    .stars {
+      font-size: 0.8rem;
+    }
+
+    :global(.screenshots-group) {
+      grid-template-columns: 1fr;
+    }
+
+    :global(.screenshot-item figcaption) {
+      font-size: 0.76rem;
+    }
+
+    .links-grid {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+
+    .link-label {
+      font-size: 0.94rem;
+    }
+
+    .link-url {
+      font-size: 0.88rem;
+    }
+
+    .footer-title {
+      font-size: 1.14rem;
+    }
+
+    .time-display {
+      font-size: 0.84rem;
+    }
+
+    .mobile-nav-item {
+      font-size: 1rem;
+      padding: 0.85rem 1.05rem;
+    }
+
+    .timeline-line-col {
+      display: none;
+    }
+
+    .timeline-item {
+      gap: 0;
     }
   }
 
   /* ═══ Home Page Enhancement Styles ═══ */
-
-  /* Availability Badge */
-  .availability-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.4rem;
-    margin-top: 0.3rem;
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    color: var(--accent-green);
-  }
-
-  .availability-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--accent-green);
-    box-shadow: 0 0 6px rgba(16, 185, 129, 0.5);
-    animation: pulseGlow 2.5s ease-in-out infinite;
-  }
-
-  @keyframes pulseGlow {
-    0%, 100% {
-      box-shadow: 0 0 4px rgba(16, 185, 129, 0.4);
-      opacity: 1;
-    }
-    50% {
-      box-shadow: 0 0 14px rgba(16, 185, 129, 0.75);
-      opacity: 0.7;
-    }
-  }
 
   /* Home Section Blocks */
   .home-section-block {
@@ -2130,7 +2509,7 @@
     color: inherit;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    padding: 1rem 1.25rem;
+    padding: 1.1rem 1.35rem;
     border-radius: 8px;
     margin-bottom: 0.65rem;
     transition: border-color 0.25s ease, transform 0.25s ease;
@@ -2155,10 +2534,10 @@
     align-items: center;
     gap: 0.3rem;
     font-family: var(--font-mono);
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     color: var(--text-secondary);
     text-decoration: none;
-    margin-top: 1.25rem;
+    margin-top: 1.15rem;
     transition: color 0.15s ease, gap 0.15s ease;
   }
 
@@ -2176,10 +2555,10 @@
 
   .tech-pill {
     font-family: var(--font-mono);
-    font-size: 0.78rem;
+    font-size: 0.8rem;
     color: var(--text-secondary);
     border: 1px solid var(--border-color);
-    padding: 0.18rem 0.55rem;
+    padding: 0.2rem 0.58rem;
     border-radius: 4px;
     background: rgba(255, 255, 255, 0.015);
     transition: border-color 0.2s ease, color 0.2s ease;
@@ -2203,7 +2582,7 @@
     gap: 0.85rem;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    padding: 1.1rem;
+    padding: 1.15rem;
     border-radius: 8px;
   }
 
@@ -2215,7 +2594,7 @@
 
   .skills-summary-label {
     font-family: var(--font-mono);
-    font-size: 0.8rem;
+    font-size: 0.88rem;
     color: var(--text-muted);
   }
 
@@ -2223,23 +2602,26 @@
   .skills-category-block {
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1.35rem;
   }
 
   .skills-cat-header {
-    font-size: 1.35rem;
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    font-size: 1.18rem;
     font-weight: 600;
     color: var(--text-primary);
     border-bottom: 1px solid var(--border-color);
     padding-bottom: 0.5rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.65rem;
   }
 
   .skill-group-title {
-    font-size: 1.05rem;
+    font-size: 1.06rem;
     font-weight: 600;
     color: var(--text-primary);
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.45rem;
   }
 
   .skill-detail-row {
@@ -2251,15 +2633,15 @@
 
   .sub-label {
     font-family: var(--font-mono);
-    font-size: 0.82rem;
+    font-size: 0.88rem;
     color: var(--text-muted);
-    min-width: 65px;
+    min-width: 68px;
   }
 
   .soft-skills-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 0.95rem;
   }
 
   .soft-skill-card {
@@ -2268,7 +2650,7 @@
     align-items: flex-start;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    padding: 1rem 1.15rem;
+    padding: 1rem 1.2rem;
     border-radius: 8px;
     transition: border-color 0.2s ease;
   }
@@ -2283,16 +2665,16 @@
   }
 
   .soft-skill-title {
-    font-size: 0.95rem;
+    font-size: 1rem;
     font-weight: 600;
     color: var(--text-primary);
     margin-bottom: 0.25rem;
   }
 
   .soft-skill-desc {
-    font-size: 0.85rem;
+    font-size: 0.94rem;
     color: var(--text-secondary);
-    line-height: 1.4;
+    line-height: 1.55;
   }
 
   /* Concise Featured Projects List */
@@ -2308,7 +2690,7 @@
     justify-content: space-between;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    padding: 0.85rem 1.15rem;
+    padding: 0.95rem 1.2rem;
     border-radius: 8px;
     text-align: left;
     transition: border-color 0.25s ease, transform 0.25s ease;
@@ -2336,13 +2718,13 @@
 
   .featured-project-row .row-title {
     font-family: var(--font-mono);
-    font-size: 0.95rem;
+    font-size: 1.02rem;
     font-weight: 600;
     color: var(--text-primary);
   }
 
   .featured-project-row .row-desc {
-    font-size: 0.85rem;
+    font-size: 0.94rem;
     color: var(--text-secondary);
     white-space: nowrap;
     overflow: hidden;
@@ -2350,8 +2732,8 @@
   }
 
   .tag-primary.compact {
-    font-size: 0.7rem;
-    padding: 0.1rem 0.35rem;
+    font-size: 0.74rem;
+    padding: 0.12rem 0.38rem;
   }
 
   .featured-project-row .row-right {
