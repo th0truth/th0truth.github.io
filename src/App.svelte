@@ -442,6 +442,190 @@
     animFrameId = requestAnimationFrame(animateRing);
   }
 
+  let canvasEl = $state<HTMLCanvasElement | null>(null);
+  let canvasAnimId: number;
+
+  function initSerotoninBackground(canvas: HTMLCanvasElement) {
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return () => {};
+
+    let w = (canvas.width = window.innerWidth);
+    let h = (canvas.height = window.innerHeight);
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    function resize() {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx!.scale(dpr, dpr);
+    }
+    resize();
+
+    // Particle nodes system
+    const PARTICLE_COUNT = Math.min(Math.floor((w * h) / 24000), 50);
+    const particles = Array.from({ length: PARTICLE_COUNT }, () => ({
+      x: Math.random() * w,
+      y: Math.random() * h,
+      vx: (Math.random() - 0.5) * 0.35,
+      vy: (Math.random() - 0.5) * 0.35,
+      radius: Math.random() * 1.4 + 0.6,
+      baseAlpha: Math.random() * 0.3 + 0.15,
+      phase: Math.random() * Math.PI * 2
+    }));
+
+    let time = 0;
+    let smoothMouseX = w / 2;
+    let smoothMouseY = h / 2;
+
+    function render() {
+      if (document.hidden) {
+        canvasAnimId = requestAnimationFrame(render);
+        return;
+      }
+
+      time += 0.005;
+      smoothMouseX += (targetX - smoothMouseX) * 0.05;
+      smoothMouseY += (targetY - smoothMouseY) * 0.05;
+
+      ctx!.clearRect(0, 0, w, h);
+
+      // 1. Ambient Dynamic Glowing Blobs
+      const blobs = [
+        {
+          x: w * 0.25 + Math.sin(time * 0.55) * 120,
+          y: h * 0.25 + Math.cos(time * 0.45) * 80,
+          r: Math.max(w, h) * 0.42,
+          color: 'rgba(99, 102, 241, 0.055)'
+        },
+        {
+          x: w * 0.78 + Math.cos(time * 0.4) * 140,
+          y: h * 0.6 + Math.sin(time * 0.55) * 90,
+          r: Math.max(w, h) * 0.46,
+          color: 'rgba(20, 184, 166, 0.045)'
+        },
+        {
+          x: w * 0.48 + Math.sin(time * 0.7) * 90,
+          y: h * 0.88 + Math.cos(time * 0.65) * 70,
+          r: Math.max(w, h) * 0.4,
+          color: 'rgba(139, 92, 246, 0.04)'
+        }
+      ];
+
+      for (const blob of blobs) {
+        const grad = ctx!.createRadialGradient(blob.x, blob.y, 0, blob.x, blob.y, blob.r);
+        grad.addColorStop(0, blob.color);
+        grad.addColorStop(1, 'rgba(12, 12, 14, 0)');
+        ctx!.fillStyle = grad;
+        ctx!.beginPath();
+        ctx!.arc(blob.x, blob.y, blob.r, 0, Math.PI * 2);
+        ctx!.fill();
+      }
+
+      // 2. Interactive Cursor Halo
+      if (cursorVisible && targetX > 0 && targetY > 0) {
+        const mouseGlow = ctx!.createRadialGradient(
+          smoothMouseX,
+          smoothMouseY,
+          0,
+          smoothMouseX,
+          smoothMouseY,
+          260
+        );
+        mouseGlow.addColorStop(0, 'rgba(255, 255, 255, 0.035)');
+        mouseGlow.addColorStop(0.5, 'rgba(161, 161, 170, 0.015)');
+        mouseGlow.addColorStop(1, 'rgba(0, 0, 0, 0)');
+        ctx!.fillStyle = mouseGlow;
+        ctx!.beginPath();
+        ctx!.arc(smoothMouseX, smoothMouseY, 260, 0, Math.PI * 2);
+        ctx!.fill();
+      }
+
+      // 3. Fluid Wave Filaments (Serotonin-style organic ribbons)
+      const waves = [
+        { yOffset: 0.26, freq: 0.0018, amp: 40, speed: 1.0, color: 'rgba(161, 161, 170, 0.05)' },
+        { yOffset: 0.52, freq: 0.0022, amp: 55, speed: -0.85, color: 'rgba(99, 102, 241, 0.045)' },
+        { yOffset: 0.76, freq: 0.0016, amp: 45, speed: 1.15, color: 'rgba(20, 184, 166, 0.04)' }
+      ];
+
+      for (const wave of waves) {
+        ctx!.beginPath();
+        ctx!.strokeStyle = wave.color;
+        ctx!.lineWidth = 1.5;
+
+        const baseY = h * wave.yOffset;
+        for (let x = 0; x <= w; x += 16) {
+          const dx = x - smoothMouseX;
+          const dy = baseY - smoothMouseY;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+          const mouseDisplace = dist < 220 ? (1 - dist / 220) * 22 * Math.sin(dist * 0.05 - time * 2) : 0;
+
+          const y =
+            baseY +
+            Math.sin(x * wave.freq + time * wave.speed) * wave.amp +
+            Math.cos(x * wave.freq * 0.55 - time * 0.5) * (wave.amp * 0.35) +
+            mouseDisplace;
+
+          if (x === 0) ctx!.moveTo(x, y);
+          else ctx!.lineTo(x, y);
+        }
+        ctx!.stroke();
+      }
+
+      // 4. Subtle Interconnected Fluid Particles
+      for (let i = 0; i < particles.length; i++) {
+        const p = particles[i];
+        p.x += p.vx + Math.sin(time + p.phase) * 0.12;
+        p.y += p.vy + Math.cos(time + p.phase) * 0.12;
+
+        if (p.x < -20) p.x = w + 20;
+        if (p.x > w + 20) p.x = -20;
+        if (p.y < -20) p.y = h + 20;
+        if (p.y > h + 20) p.y = -20;
+
+        const pdx = p.x - smoothMouseX;
+        const pdy = p.y - smoothMouseY;
+        const pDist = Math.sqrt(pdx * pdx + pdy * pdy);
+        if (pDist < 120) {
+          const force = (1 - pDist / 120) * 1.4;
+          p.x += (pdx / pDist) * force;
+          p.y += (pdy / pDist) * force;
+        }
+
+        ctx!.fillStyle = `rgba(228, 228, 231, ${p.baseAlpha})`;
+        ctx!.beginPath();
+        ctx!.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx!.fill();
+
+        for (let j = i + 1; j < particles.length; j++) {
+          const p2 = particles[j];
+          const ldx = p.x - p2.x;
+          const ldy = p.y - p2.y;
+          const lDist = Math.sqrt(ldx * ldx + ldy * ldy);
+          if (lDist < 85) {
+            ctx!.strokeStyle = `rgba(161, 161, 170, ${0.05 * (1 - lDist / 85)})`;
+            ctx!.lineWidth = 0.8;
+            ctx!.beginPath();
+            ctx!.moveTo(p.x, p.y);
+            ctx!.lineTo(p2.x, p2.y);
+            ctx!.stroke();
+          }
+        }
+      }
+
+      canvasAnimId = requestAnimationFrame(render);
+    }
+
+    render();
+    window.addEventListener('resize', resize);
+
+    return () => {
+      cancelAnimationFrame(canvasAnimId);
+      window.removeEventListener('resize', resize);
+    };
+  }
+
   onMount(() => {
     updateTime();
     loadBio();
@@ -450,6 +634,10 @@
     syncRouteFromHash();
 
     animFrameId = requestAnimationFrame(animateRing);
+    let cleanupBg: (() => void) | undefined;
+    if (canvasEl) {
+      cleanupBg = initSerotoninBackground(canvasEl);
+    }
 
     const interval = setInterval(updateTime, 1000);
     window.addEventListener('keydown', handleKeydown);
@@ -463,6 +651,7 @@
     return () => {
       clearInterval(interval);
       cancelAnimationFrame(animFrameId);
+      if (cleanupBg) cleanupBg();
       window.removeEventListener('keydown', handleKeydown);
       window.removeEventListener('hashchange', syncRouteFromHash);
       window.removeEventListener('mousemove', updateCursorPos);
@@ -473,6 +662,8 @@
     };
   });
 </script>
+
+<canvas class="ambient-fluid-canvas" bind:this={canvasEl}></canvas>
 
 <main class="portfolio-container">
   <!-- Top Navigation Header -->
@@ -925,6 +1116,17 @@
       display: none !important;
     }
   }
+  .ambient-fluid-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.9;
+  }
+
   .portfolio-container {
     width: 100%;
     max-width: 760px;
@@ -932,6 +1134,7 @@
     box-sizing: border-box;
     padding: 0 1.25rem;
     position: relative;
+    z-index: 1;
     overflow-x: hidden;
   }
 
