@@ -3,7 +3,7 @@
   import { fade } from 'svelte/transition';
   import { parse } from 'marked';
   import DOMPurify from 'dompurify';
-  import { Home, Briefcase, FolderGit2, ArrowLeft, ExternalLink, Code2, Clock, X, ChevronRight, Layers, Cpu, GraduationCap, Database, Eye, Tv, Binary, CircuitBoard, BarChart3 } from '@lucide/svelte';
+  import { Home, Briefcase, FolderGit2, ArrowLeft, ExternalLink, Code2, Clock, X, ChevronRight, Cpu, GraduationCap, Database, Eye, Tv, Binary, CircuitBoard, BarChart3 } from '@lucide/svelte';
 
   const projectIconsMap: Record<string, any> = {
     Cpu,
@@ -20,7 +20,6 @@
   const navItems = [
     { key: 'h', label: 'home', id: 'home', hash: '#/', icon: Home },
     { key: 'e', label: 'experience', id: 'experience', hash: '#/experience', icon: Briefcase },
-    { key: 's', label: 'skills', id: 'skills', hash: '#/skills', icon: Layers },
     { key: 'p', label: 'projects', id: 'projects', hash: '#/projects', icon: FolderGit2 }
   ];
 
@@ -55,27 +54,7 @@
   let experiences = $state<ExperienceMeta[]>([]);
   let loadingExp = $state(true);
 
-  // Skills Dynamic State
-  interface SkillTechCategory {
-    category: string;
-    primary?: string[];
-    familiar?: string[];
-    items?: string[];
-  }
 
-  interface SoftSkillItem {
-    title: string;
-    icon: string;
-    description: string;
-  }
-
-  interface SkillsData {
-    technical: SkillTechCategory[];
-    soft: SoftSkillItem[];
-  }
-
-  let skillsData = $state<SkillsData>({ technical: [], soft: [] });
-  let loadingSkills = $state(true);
 
   interface ProjectMeta {
     slug: string;
@@ -169,10 +148,6 @@
       currentTab = 'home';
       selectedProject = null;
       selectedProjectSlug = null;
-    } else if (hash === '#/skills') {
-      currentTab = 'skills';
-      selectedProject = null;
-      selectedProjectSlug = null;
     } else if (hash === '#/experience') {
       currentTab = 'experience';
       selectedProject = null;
@@ -224,6 +199,62 @@
     if (match) {
       window.location.hash = match.hash;
     }
+  }
+
+  // Brute Force Matrix / Decrypt Scramble Text Action
+  const GLYPHS = 'abcdefghijklmnopqrstuvwxyz0123456789+-_/~!#$&';
+
+  function scramble(node: HTMLElement, targetText?: string) {
+    const finalTarget = (targetText || node.getAttribute('data-text') || node.textContent || '').trim();
+    node.setAttribute('data-text', finalTarget);
+    let iteration = 0;
+    let frameId: number;
+    let lastTime = performance.now();
+    const totalChars = finalTarget.length;
+    const intervalMs = 32;
+
+    function step(now: number) {
+      if (now - lastTime >= intervalMs) {
+        lastTime = now;
+        const currentProgress = Math.floor(iteration);
+
+        node.innerText = finalTarget
+          .split('')
+          .map((char, index) => {
+            if (char === ' ') return ' ';
+            if (index < currentProgress) {
+              return finalTarget[index];
+            }
+            if (index === currentProgress && Math.random() > 0.45) {
+              return finalTarget[index];
+            }
+            return GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+          })
+          .join('');
+
+        iteration += 0.35;
+      }
+
+      if (iteration <= totalChars + 1) {
+        frameId = requestAnimationFrame(step);
+      } else {
+        node.innerText = finalTarget;
+      }
+    }
+
+    frameId = requestAnimationFrame(step);
+
+    return {
+      update(newTarget: string) {
+        cancelAnimationFrame(frameId);
+        iteration = 0;
+        node.setAttribute('data-text', newTarget);
+        frameId = requestAnimationFrame(step);
+      },
+      destroy() {
+        cancelAnimationFrame(frameId);
+      }
+    };
   }
 
   async function loadBio() {
@@ -411,23 +442,9 @@
     animFrameId = requestAnimationFrame(animateRing);
   }
 
-  async function loadSkills() {
-    try {
-      loadingSkills = true;
-      const res = await fetch('./content/skills/skills.json');
-      if (!res.ok) throw new Error('Failed to load skills data');
-      skillsData = await res.json();
-    } catch (err) {
-      console.error('Error loading skills:', err);
-    } finally {
-      loadingSkills = false;
-    }
-  }
-
   onMount(() => {
     updateTime();
     loadBio();
-    loadSkills();
     loadExperiences();
     fetchSelectedProjects();
     syncRouteFromHash();
@@ -507,7 +524,7 @@
 
   <!-- TAB CONTENT: HOME -->
   {#if currentTab === 'home' && !selectedProject}
-    <section class="tab-content bio-section" in:fade={{ duration: 180 }}>
+    <section class="tab-content bio-section">
       <!-- Profile Avatar & Title Header with Subdued Glow Radar Ring -->
       <div class="profile-header">
         <div class="avatar-radar-wrapper">
@@ -621,91 +638,13 @@
       </div>
     </section>
 
-  {:else if currentTab === 'skills' && !selectedProject}
-    <section class="tab-content" in:fade={{ duration: 180 }}>
-      <div class="section-title-wrapper">
-        <span class="section-bar"></span>
-        <h2>skills</h2>
-      </div>
 
-      {#if loadingSkills}
-        <p class="status-msg">Loading skills...</p>
-      {:else}
-        <!-- Technical Skills with Timeline Nodes & Vertical Lines -->
-        <div class="skills-category-block">
-          <h3 class="skills-cat-header">
-            <span class="section-bar"></span>
-            <span>technical skills</span>
-          </h3>
-
-          <div class="timeline-list">
-            {#each (skillsData?.technical ?? []) as group}
-              <div class="timeline-item">
-                <div class="timeline-line-col">
-                  <div class="timeline-node"></div>
-                  <div class="timeline-vertical-line"></div>
-                </div>
-                <div class="timeline-card">
-                  <h4 class="skill-group-title">{group.category}</h4>
-                  {#if group.primary}
-                    <div class="skill-detail-row">
-                      <span class="sub-label">Primary:</span>
-                      <div class="tech-stack-grid">
-                        {#each group.primary as item}
-                          <span class="tech-pill highlight">{item}</span>
-                        {/each}
-                      </div>
-                    </div>
-                  {/if}
-                  {#if group.familiar}
-                    <div class="skill-detail-row">
-                      <span class="sub-label">Familiar:</span>
-                      <div class="tech-stack-grid">
-                        {#each group.familiar as item}
-                          <span class="tech-pill">{item}</span>
-                        {/each}
-                      </div>
-                    </div>
-                  {/if}
-                  {#if group.items}
-                    <div class="tech-stack-grid">
-                      {#each group.items as item}
-                        <span class="tech-pill">{item}</span>
-                      {/each}
-                    </div>
-                  {/if}
-                </div>
-              </div>
-            {/each}
-          </div>
-        </div>
-
-        <!-- Soft Skills Section -->
-        <div class="skills-category-block" style="margin-top: 3.5rem;">
-          <h3 class="skills-cat-header">
-            <span class="section-bar"></span>
-            <span>soft skills</span>
-          </h3>
-          <div class="soft-skills-grid">
-            {#each (skillsData?.soft ?? []) as soft}
-              <div class="soft-skill-card">
-                <span class="soft-skill-icon">{soft.icon}</span>
-                <div>
-                  <h4 class="soft-skill-title">{soft.title}</h4>
-                  <p class="soft-skill-desc">{soft.description}</p>
-                </div>
-              </div>
-            {/each}
-          </div>
-        </div>
-      {/if}
-    </section>
 
   {:else if currentTab === 'experience' && !selectedProject}
-    <section class="tab-content" in:fade={{ duration: 180 }}>
+    <section class="tab-content">
       <div class="section-title-wrapper">
         <span class="section-bar"></span>
-        <h2>experience</h2>
+        <h2 use:scramble={'experience'} onmouseenter={(e) => scramble(e.currentTarget)}>experience</h2>
       </div>
 
       {#if loadingExp}
@@ -762,10 +701,10 @@
     </section>
 
   {:else if currentTab === 'projects' && !selectedProject}
-    <section class="tab-content" in:fade={{ duration: 180 }}>
+    <section class="tab-content">
       <div class="section-title-wrapper">
         <span class="section-bar"></span>
-        <h2>projects</h2>
+        <h2 use:scramble={'projects'} onmouseenter={(e) => scramble(e.currentTarget)}>projects</h2>
       </div>
       
       {#if loadingProjects}
@@ -815,7 +754,7 @@
 
   <!-- DEDICATED PROJECT DETAIL PAGE -->
   {:else if selectedProject}
-    <section class="tab-content project-detail-section" in:fade={{ duration: 180 }}>
+    <section class="tab-content project-detail-section">
       <div class="detail-top-bar">
         <button class="back-btn" onclick={closeProjectDetail}>
           <ArrowLeft size={16} class="btn-icon" />
@@ -842,9 +781,9 @@
   <!-- Footer Links Section -->
   <footer class="footer-section">
     <div class="footer-header">
-      <h2 class="footer-title">
+      <h2 class="footer-title" onmouseenter={(e) => { const s = e.currentTarget.querySelector('.scramble-target'); if (s) scramble(s as HTMLElement); }}>
         <span class="section-bar"></span>
-        <span>find me here ~</span>
+        <span class="scramble-target" use:scramble={'find me here ~'}>find me here ~</span>
       </h2>
       <div class="time-wrapper">
         <Clock size={14} class="clock-icon" />
@@ -1623,20 +1562,38 @@
 
   .section-bar {
     display: inline-block;
-    width: 18px;
-    height: 2px;
-    background: var(--text-primary);
+    width: 24px;
+    height: 2.5px;
+    background: linear-gradient(90deg, #e4e4e7 0%, #a1a1aa 55%, #52525b 100%);
     border-radius: 1px;
     flex-shrink: 0;
-    opacity: 0.85;
+    transform-origin: left center;
+    animation: sectionBarIn 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+    box-shadow: 0 0 8px rgba(228, 228, 231, 0.35);
+  }
+
+  @keyframes sectionBarIn {
+    0% {
+      width: 0;
+      opacity: 0;
+      transform: scaleX(0);
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      width: 24px;
+      opacity: 1;
+      transform: scaleX(1);
+    }
   }
 
   .section-title-wrapper h2 {
-    font-size: 1.35rem;
+    font-size: 1.52rem;
     font-weight: 600;
     color: var(--text-primary);
     line-height: 1.2;
-    letter-spacing: -0.01em;
+    letter-spacing: -0.015em;
   }
 
   :global(.section-icon) {
@@ -1662,8 +1619,8 @@
     display: flex;
     align-items: center;
     gap: 0.65rem;
-    font-size: 1.2rem;
-    font-weight: 500;
+    font-size: 1.35rem;
+    font-weight: 600;
     color: var(--text-primary);
   }
 
@@ -1715,6 +1672,30 @@
   .tab-content {
     min-height: 260px;
     width: 100%;
+    animation: tabEnter 0.65s cubic-bezier(0.16, 1, 0.3, 1) both;
+    will-change: opacity, transform, filter;
+  }
+
+  @keyframes tabEnter {
+    0% {
+      opacity: 0;
+      transform: translateY(24px);
+      filter: blur(3px);
+    }
+    50% {
+      filter: blur(0);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .tab-content {
+      animation: none;
+    }
   }
 
   .status-msg {
@@ -2106,17 +2087,14 @@
     }
 
     .section-title-wrapper h2 {
-      font-size: 1.35rem;
+      font-size: 1.46rem;
     }
 
     .section-bar {
-      width: 18px;
-      height: 2px;
+      width: 22px;
+      height: 2.5px;
     }
 
-    .skills-cat-header {
-      font-size: 1.18rem;
-    }
 
     .exp-role {
       font-size: 1.20rem;
@@ -2151,33 +2129,6 @@
 
     .show-more-link {
       font-size: 0.9rem;
-    }
-
-
-    .tech-pill {
-      font-size: 0.82rem;
-      padding: 0.2rem 0.55rem;
-    }
-
-    .skill-group-title {
-      font-size: 1.06rem;
-    }
-
-    .sub-label {
-      font-size: 0.88rem;
-    }
-
-    .soft-skill-icon {
-      font-size: 1.25rem;
-    }
-
-    .soft-skill-title {
-      font-size: 1.02rem;
-    }
-
-    .soft-skill-desc {
-      font-size: 0.94rem;
-      line-height: 1.55;
     }
 
     .featured-project-row {
@@ -2243,7 +2194,7 @@
     }
 
     .footer-title {
-      font-size: 1.18rem;
+      font-size: 1.28rem;
     }
 
     .time-display {
@@ -2300,17 +2251,14 @@
     }
 
     .section-title-wrapper h2 {
-      font-size: 1.3rem;
+      font-size: 1.40rem;
     }
 
     .section-bar {
-      width: 16px;
+      width: 20px;
       height: 2px;
     }
 
-    .skills-cat-header {
-      font-size: 1.14rem;
-    }
 
     .exp-header-row {
       display: flex;
@@ -2364,23 +2312,6 @@
     }
 
 
-    .tech-pill {
-      font-size: 0.8rem;
-      padding: 0.18rem 0.5rem;
-    }
-
-    .soft-skills-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .soft-skill-title {
-      font-size: 0.98rem;
-    }
-
-    .soft-skill-desc {
-      font-size: 0.90rem;
-      line-height: 1.5;
-    }
 
     .featured-project-row .row-desc {
       white-space: normal;
@@ -2431,7 +2362,7 @@
     }
 
     .footer-title {
-      font-size: 1.14rem;
+      font-size: 1.22rem;
     }
 
     .time-display {
@@ -2504,111 +2435,6 @@
     gap: 0.5rem;
   }
 
-  /* Tech Stack Grid */
-  .tech-stack-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-  }
-
-  .tech-pill {
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    color: var(--text-secondary);
-    border: 1px solid var(--border-color);
-    padding: 0.2rem 0.58rem;
-    border-radius: 4px;
-    background: rgba(255, 255, 255, 0.015);
-    transition: border-color 0.2s ease, color 0.2s ease;
-  }
-
-  .tech-pill.highlight {
-    color: var(--text-primary);
-    border-color: #5e5e65;
-    background: rgba(255, 255, 255, 0.05);
-    font-weight: 500;
-  }
-
-
-
-  /* Skills Dedicated Page Styles */
-  .skills-category-block {
-    display: flex;
-    flex-direction: column;
-    gap: 1.35rem;
-  }
-
-  .skills-cat-header {
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-    font-size: 1.18rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 0.5rem;
-    margin-bottom: 0.65rem;
-  }
-
-  .skill-group-title {
-    font-size: 1.06rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 0.45rem;
-  }
-
-  .skill-detail-row {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    margin-bottom: 0.4rem;
-  }
-
-  .sub-label {
-    font-family: var(--font-mono);
-    font-size: 0.88rem;
-    color: var(--text-muted);
-    min-width: 68px;
-  }
-
-  .soft-skills-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 0.95rem;
-  }
-
-  .soft-skill-card {
-    display: flex;
-    gap: 0.85rem;
-    align-items: flex-start;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    padding: 1rem 1.2rem;
-    border-radius: 8px;
-    transition: border-color 0.2s ease;
-  }
-
-  .soft-skill-card:hover {
-    border-color: #5e5e65;
-  }
-
-  .soft-skill-icon {
-    font-size: 1.25rem;
-    line-height: 1;
-  }
-
-  .soft-skill-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    margin-bottom: 0.25rem;
-  }
-
-  .soft-skill-desc {
-    font-size: 0.94rem;
-    color: var(--text-secondary);
-    line-height: 1.55;
-  }
 
   /* Concise Featured Projects List */
   .featured-project-list {
