@@ -1,16 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible+Next:ital,wght@0,200..800;1,200..800&family=Atkinson+Hyperlegible+Code:ital,wght@0,200..800;1,200..800&display=swap');
 
 :root {
-  --bg-main: #0c0c0e;
-  --bg-card: rgba(20, 20, 24, 0.75);
+  /* Warm dark palette inspired by zure.cc */
+  --bg-main: #111111;
+  --bg-card: #191919;
+  --bg-card-hover: #1e1e1e;
   --border-color: rgba(255, 255, 255, 0.08);
-  --border-hover: rgba(255, 255, 255, 0.18);
-  --text-primary: #f4f4f5;
-  --text-secondary: #a1a1aa;
-  --text-muted: #71717a;
-  --accent-green: #10b981;
-  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-mono: 'Fira Code', monospace;
+  --border-hover: rgba(255, 255, 255, 0.16);
+
+  /* Warm text hierarchy */
+  --text-primary: #e8e0d4;
+  --text-secondary: #9a9388;
+  --text-muted: #6b655d;
+
+  /* Fonts */
+  --font-body: 'Atkinson Hyperlegible Next', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-code: 'Atkinson Hyperlegible Code', 'Fira Code', monospace;
 }
 
 * {
@@ -26,19 +31,13 @@ html, body {
   font-size: 16px;
 }
 
-@media (pointer: fine) {
-  html, body, a, button, input, textarea, [data-src], .project-card, .screenshot-item {
-    cursor: none !important;
-  }
-}
-
 body {
   background-color: var(--bg-main);
   color: var(--text-primary);
-  font-family: var(--font-sans);
+  font-family: var(--font-body);
   min-height: 100vh;
-  padding: 3.5rem 0;
-  line-height: 1.65;
+  padding: 0;
+  line-height: 1.7;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   overflow-wrap: break-word;
@@ -58,16 +57,7 @@ button {
   cursor: pointer;
 }
 
-@media (max-width: 768px) {
-  body {
-    padding: 1.5rem 0;
-    line-height: 1.65;
-  }
-}
-
-@media (max-width: 480px) {
-  body {
-    padding: 1rem 0;
-    line-height: 1.6;
-  }
+::selection {
+  background: rgba(232, 224, 212, 0.15);
+  color: var(--text-primary);
 }
