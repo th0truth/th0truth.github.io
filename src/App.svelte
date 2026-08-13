@@ -390,7 +390,7 @@
         <!-- Skills -->
         {#if skillsData}
           <div class="section-block">
-            <h2 class="section-heading">skills</h2>
+            <h2 class="section-heading"><span class="heading-hash">#</span>skills</h2>
             <div class="skills-grid">
               {#each skillsData.technical as cat}
                 <div class="skill-category">
@@ -413,7 +413,7 @@
 
         <!-- Experience Preview -->
         <div class="section-block">
-          <h2 class="section-heading">experience</h2>
+          <h2 class="section-heading"><span class="heading-hash">#</span>experience</h2>
           {#if loadingExp}
             <p class="loading-text">loading...</p>
           {:else if experiences.length > 0}
@@ -441,7 +441,7 @@
 
         <!-- Featured Projects -->
         <div class="section-block">
-          <h2 class="section-heading">selected projects</h2>
+          <h2 class="section-heading"><span class="heading-hash">#</span>selected projects</h2>
           {#if loadingProjects}
             <p class="loading-text">loading...</p>
           {:else if featuredProjects.length > 0}
@@ -469,7 +469,7 @@
     <!-- ═══════════════════ EXPERIENCE ═══════════════════ -->
     {:else if currentTab === 'experience' && !selectedProject}
       <section class="page-section" id="experience-section">
-        <h2 class="page-title">experience</h2>
+        <h2 class="page-title"><span class="heading-hash">#</span>experience</h2>
 
         {#if loadingExp}
           <p class="loading-text">loading...</p>
@@ -518,7 +518,7 @@
     <!-- ═══════════════════ PROJECTS ═══════════════════ -->
     {:else if currentTab === 'projects' && !selectedProject}
       <section class="page-section" id="projects-section">
-        <h2 class="page-title">projects</h2>
+        <h2 class="page-title"><span class="heading-hash">#</span>projects</h2>
 
         {#if loadingProjects}
           <p class="loading-text">loading...</p>
@@ -590,7 +590,7 @@
 
   <!-- Footer -->
   <footer class="site-footer">
-    <h2 class="footer-heading">find me here</h2>
+    <h2 class="footer-heading"><span class="heading-hash">#</span>find me here</h2>
     <div class="footer-links">
       <div class="footer-link-item">
         <span class="footer-link-label">LinkedIn</span>
@@ -777,24 +777,37 @@
 
   .page-title {
     font-family: var(--font-body);
-    font-size: 1.5rem;
+    font-size: 1.4rem;
     font-weight: 600;
     color: var(--text-primary);
     margin-bottom: 2rem;
     letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
   }
 
   .section-block {
-    margin-top: 3rem;
+    margin-top: 3.25rem;
   }
 
   .section-heading {
     font-family: var(--font-body);
-    font-size: 1.1rem;
+    font-size: 1.3rem;
     font-weight: 600;
     color: var(--text-primary);
     margin-bottom: 1.25rem;
-    letter-spacing: -0.005em;
+    letter-spacing: -0.01em;
+    display: flex;
+    align-items: center;
+  }
+
+  .heading-hash {
+    font-family: var(--font-code);
+    color: var(--text-muted);
+    font-weight: 400;
+    font-size: 1.15em;
+    margin-right: 0.15rem;
+    opacity: 0.65;
   }
 
   .loading-text {
@@ -1487,10 +1500,13 @@
   }
 
   .footer-heading {
-    font-size: 1.1rem;
+    font-family: var(--font-body);
+    font-size: 1.25rem;
     font-weight: 600;
     color: var(--text-primary);
     margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
   }
 
   .footer-links {
