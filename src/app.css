@@ -56,10 +56,16 @@ button {
   border: none;
   color: inherit;
   font: inherit;
-  cursor: pointer;
 }
 
 ::selection {
   background: rgba(232, 224, 212, 0.15);
   color: var(--text-primary);
 }
+
+@media (pointer: fine) {
+  *, *::before, *::after, html, body, a, button, input, textarea, select, label {
+    cursor: none !important;
+  }
+}
+

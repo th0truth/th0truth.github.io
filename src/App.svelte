@@ -292,6 +292,59 @@
     }
   }
 
+  // Custom cursor state & smooth tracking
+  let isHovered = $state(false);
+  let isClicking = $state(false);
+  let isCursorVisible = $state(false);
+
+  let mouseX = -100;
+  let mouseY = -100;
+  let currentRingX = -100;
+  let currentRingY = -100;
+  let animFrameId: number;
+
+  function updateCursorPos(e: MouseEvent) {
+    if (!isCursorVisible) isCursorVisible = true;
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+
+    const dotEl = document.getElementById('custom-cursor-dot');
+    if (dotEl) {
+      dotEl.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0)`;
+    }
+
+    const target = e.target as HTMLElement;
+    if (target) {
+      const interactive = target.closest('a, button, [role="button"], input, textarea, select, label, [data-src], .screenshot-item, .project-card, .tag, .filter-chip');
+      const shouldHover = !!interactive;
+      if (isHovered !== shouldHover) {
+        isHovered = shouldHover;
+      }
+    }
+  }
+
+  function handleMouseDown() {
+    isClicking = true;
+  }
+
+  function handleMouseUp() {
+    isClicking = false;
+  }
+
+  function handleMouseLeave() {
+    isCursorVisible = false;
+  }
+
+  function animateRing() {
+    currentRingX += (mouseX - currentRingX) * 0.22;
+    currentRingY += (mouseY - currentRingY) * 0.22;
+    const ringEl = document.getElementById('custom-cursor-ring');
+    if (ringEl) {
+      ringEl.style.transform = `translate3d(${currentRingX}px, ${currentRingY}px, 0)`;
+    }
+    animFrameId = requestAnimationFrame(animateRing);
+  }
+
   onMount(() => {
     loadBio();
     loadSkills();
@@ -299,14 +352,25 @@
     fetchSelectedProjects();
     syncRouteFromHash();
 
+    animFrameId = requestAnimationFrame(animateRing);
+
     window.addEventListener('keydown', handleKeydown);
     window.addEventListener('hashchange', syncRouteFromHash);
     window.addEventListener('click', handleContainerClick);
+    window.addEventListener('mousemove', updateCursorPos);
+    window.addEventListener('mousedown', handleMouseDown);
+    window.addEventListener('mouseup', handleMouseUp);
+    document.addEventListener('mouseleave', handleMouseLeave);
 
     return () => {
+      cancelAnimationFrame(animFrameId);
       window.removeEventListener('keydown', handleKeydown);
       window.removeEventListener('hashchange', syncRouteFromHash);
       window.removeEventListener('click', handleContainerClick);
+      window.removeEventListener('mousemove', updateCursorPos);
+      window.removeEventListener('mousedown', handleMouseDown);
+      window.removeEventListener('mouseup', handleMouseUp);
+      document.removeEventListener('mouseleave', handleMouseLeave);
     };
   });
 </script>
@@ -625,9 +689,115 @@
       <button class="overlay-close" onclick={() => activeImageOverlay = null} aria-label="Close">✕</button>
     </div>
   {/if}
+
+  <!-- Custom Animated Cursor -->
+  {#if isCursorVisible}
+    <div
+      id="custom-cursor-dot"
+      class="custom-cursor-dot {isHovered ? 'hovered' : ''} {isClicking ? 'clicking' : ''}"
+    ></div>
+    <div 
+      id="custom-cursor-ring"
+      class="custom-cursor-ring {isHovered ? 'hovered' : ''} {isClicking ? 'clicking' : ''}"
+    ></div>
+  {/if}
 </main>
 
 <style>
+  /* ═══════════════════════════════════════════════════════
+     CUSTOM ANIMATED CURSOR
+     ═══════════════════════════════════════════════════════ */
+  .custom-cursor-dot {
+    position: fixed;
+    top: -4px;
+    left: -4px;
+    width: 8px;
+    height: 8px;
+    background-color: #ffffff;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99999;
+    transition: width 0.2s ease, height 0.2s ease, top 0.2s ease, left 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    will-change: transform;
+  }
+
+  .custom-cursor-ring {
+    position: fixed;
+    top: -19px;
+    left: -19px;
+    width: 38px;
+    height: 38px;
+    border: 1.5px solid rgba(255, 255, 255, 0.45);
+    background-color: rgba(255, 255, 255, 0.02);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 99998;
+    backdrop-filter: blur(1px);
+    transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1), 
+                height 0.22s cubic-bezier(0.16, 1, 0.3, 1), 
+                top 0.22s cubic-bezier(0.16, 1, 0.3, 1), 
+                left 0.22s cubic-bezier(0.16, 1, 0.3, 1), 
+                border-color 0.2s ease, 
+                background-color 0.2s ease,
+                box-shadow 0.2s ease;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.08), inset 0 0 6px rgba(255, 255, 255, 0.03);
+    will-change: transform;
+  }
+
+  /* Hover state over interactive elements (buttons, links, cards, tags) */
+  .custom-cursor-dot.hovered {
+    width: 6px;
+    height: 6px;
+    top: -3px;
+    left: -3px;
+    background-color: #ffffff;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 1);
+  }
+
+  .custom-cursor-ring.hovered {
+    top: -22px;
+    left: -22px;
+    width: 44px;
+    height: 44px;
+    border-color: rgba(255, 255, 255, 0.9);
+    background-color: rgba(255, 255, 255, 0.06);
+    backdrop-filter: blur(1.5px);
+    box-shadow: 0 0 15px rgba(255, 255, 255, 0.16), inset 0 0 8px rgba(255, 255, 255, 0.06);
+  }
+
+  /* Active Click State */
+  .custom-cursor-dot.clicking {
+    width: 4px;
+    height: 4px;
+    top: -2px;
+    left: -2px;
+  }
+
+  .custom-cursor-ring.clicking {
+    width: 28px;
+    height: 28px;
+    top: -14px;
+    left: -14px;
+    border-color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.15);
+  }
+
+  .custom-cursor-ring.hovered.clicking {
+    width: 36px;
+    height: 36px;
+    top: -18px;
+    left: -18px;
+    border-color: #ffffff;
+    background-color: rgba(255, 255, 255, 0.16);
+  }
+
+  @media (pointer: coarse) {
+    .custom-cursor-dot, .custom-cursor-ring {
+      display: none !important;
+    }
+  }
+
   /* ═══════════════════════════════════════════════════════
      LAYOUT
      ═══════════════════════════════════════════════════════ */
