@@ -458,17 +458,25 @@
             <div class="skills-grid">
               {#each skillsData.technical as cat}
                 <div class="skill-category">
-                  <span class="skill-cat-label">{cat.category}</span>
-                  <span class="skill-cat-items">
+                  <span class="skill-cat-title">{cat.category}:</span>
+                  <div class="skill-cat-content">
                     {#if cat.primary}
-                      {cat.primary.join(', ')}
+                      <div class="skill-subline">
+                        <span class="skill-sublabel">Primary:</span>
+                        <span class="skill-subitems">{cat.primary.join(', ')}</span>
+                      </div>
                       {#if cat.familiar}
-                        <span class="familiar-label"> · familiar: {cat.familiar.join(', ')}</span>
+                        <div class="skill-subline">
+                          <span class="skill-sublabel">Familiar:</span>
+                          <span class="skill-subitems">{cat.familiar.join(', ')}</span>
+                        </div>
                       {/if}
                     {:else if cat.items}
-                      {cat.items.join(', ')}
+                      <div class="skill-subline">
+                        <span class="skill-subitems">{cat.items.join(', ')}</span>
+                      </div>
                     {/if}
-                  </span>
+                  </div>
                 </div>
               {/each}
             </div>
@@ -1094,34 +1102,82 @@
   .skills-grid {
     display: flex;
     flex-direction: column;
-    gap: 0.65rem;
+    gap: 0;
   }
 
   .skill-category {
     display: flex;
-    gap: 0.5rem;
+    flex-direction: column;
+    gap: 0.3rem;
+    padding: 0.85rem 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+    transition: background 0.2s ease;
+  }
+
+  .skill-category:first-child {
+    padding-top: 0;
+  }
+
+  .skill-category:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .skill-category:hover {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .skill-category:hover .skill-cat-title {
+    color: #f3ece2;
+  }
+
+  .skill-category:hover .skill-cat-content {
+    border-left-color: rgba(255, 255, 255, 0.22);
+  }
+
+  .skill-category:hover .skill-subitems {
+    color: var(--text-primary);
+  }
+
+  .skill-cat-title {
+    font-family: var(--font-code);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    letter-spacing: 0.01em;
+    transition: color 0.2s ease;
+  }
+
+  .skill-cat-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    padding-left: 0.85rem;
+    margin-left: 0.1rem;
+    border-left: 2px solid rgba(255, 255, 255, 0.08);
+    transition: border-color 0.25s ease;
+  }
+
+  .skill-subline {
+    display: flex;
+    align-items: baseline;
+    gap: 0.45rem;
     font-size: 0.88rem;
-    line-height: 1.6;
+    line-height: 1.65;
     flex-wrap: wrap;
   }
 
-  .skill-cat-label {
+  .skill-sublabel {
     font-family: var(--font-code);
+    font-size: 0.82rem;
     color: var(--text-muted);
+    font-weight: 500;
     flex-shrink: 0;
-    white-space: nowrap;
   }
 
-  .skill-cat-label::after {
-    content: ' —';
-  }
-
-  .skill-cat-items {
+  .skill-subitems {
     color: var(--text-secondary);
-  }
-
-  .familiar-label {
-    color: var(--text-muted);
+    transition: color 0.2s ease;
   }
 
   /* ═══════════════════════════════════════════════════════
@@ -1869,9 +1925,12 @@
       grid-template-columns: 1fr;
     }
 
-    .skill-category {
-      flex-direction: column;
-      gap: 0.15rem;
+    .skill-cat-title {
+      font-size: 0.86rem;
+    }
+
+    .skill-subline {
+      font-size: 0.84rem;
     }
 
     .detail-bar {
