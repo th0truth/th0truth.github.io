@@ -1193,29 +1193,26 @@
   .skills-grid {
     display: flex;
     flex-direction: column;
-    gap: 0;
+    gap: 0.15rem;
   }
 
   .skill-category {
     display: flex;
     flex-direction: column;
     gap: 0.35rem;
-    padding: 0.95rem 0;
+    padding: 0.75rem 0.85rem;
+    margin: 0 -0.85rem;
+    border-radius: 6px;
     border-bottom: 1px solid rgba(255, 255, 255, 0.04);
     transition: background 0.2s ease;
   }
 
-  .skill-category:first-child {
-    padding-top: 0;
-  }
-
   .skill-category:last-child {
     border-bottom: none;
-    padding-bottom: 0;
   }
 
   .skill-category:hover {
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(255, 255, 255, 0.03);
   }
 
   .skill-category:hover .skill-cat-title {
@@ -1237,13 +1234,14 @@
     color: var(--text-primary);
     letter-spacing: 0.01em;
     transition: color 0.2s ease;
+    line-height: 1.3;
   }
 
   .skill-cat-content {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
-    padding-left: 0.9rem;
+    padding: 0.05rem 0 0.05rem 0.85rem;
     margin-left: 0.1rem;
     border-left: 2px solid rgba(255, 255, 255, 0.08);
     transition: border-color 0.25s ease;
@@ -1254,7 +1252,7 @@
     align-items: baseline;
     gap: 0.5rem;
     font-size: 1rem;
-    line-height: 1.7;
+    line-height: 1.5;
     flex-wrap: wrap;
   }
 
