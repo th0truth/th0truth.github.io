@@ -1,8 +1,9 @@
-- Built asynchronous Telegram listing parsers using **Telethon**.
-- Developed interactive notification bot with **Aiogram**.
-- Integrated **Redis** caching and background task processing.
-- Designed media processing through in-memory image downloads, eliminating unnecessary disk I/O.
-- Implemented cron-based scheduled notifications for discounted rental listings.
-- Implemented duplicate & noise filtering logic for rental listings.
-- Conducted code reviews and refactoring to improve code quality and reliability.
-- Containerized the bot and deployment workflow with **Docker**.
+- Architected an asynchronous platform for aggregating real-time apartment listings from **OLX**, **LUN**, and multiple **Telegram channels**.
+- Bypassed Cloudflare TLS fingerprinting by replacing standard HTTP clients with **`curl_cffi` browser impersonation**, dynamic **SOCKS5/HTTP proxy rotation**, and distributed **multi-session Telegram accounts**.
+- Engineered an in-memory media streaming pipeline, eliminating local disk I/O.
+- Developed **fuzzy string matching** to extract structured rental data from apartment listings.
+- Designed dual-tier persistence leveraging **Redis** for caching and **MongoDB** for user search profiles and payment records.
+- Integrated **Monobank API** with webhook verification to handle recurring subscriptions, automated trial enforcement, and cron-scheduled retention discount campaigns.
+- Containerized multi-worker architecture and deployment workflows using **Docker Compose**.
+- Utilized **Kanban** methodology to plan, prioritize, and deliver iterative feature milestones.
+- Conducted PR reviews to validate code quality, maintainability, and architectural consistency across the codebase.
