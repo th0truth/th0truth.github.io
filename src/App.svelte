@@ -1295,7 +1295,7 @@
     justify-content: space-between;
     align-items: center;
     gap: 0.75rem;
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.85rem;
   }
 
   .preview-card-left {
