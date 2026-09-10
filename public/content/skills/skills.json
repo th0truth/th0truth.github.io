@@ -6,8 +6,8 @@
       "familiar": ["JavaScript", "TypeScript"]
     },
     {
-      "category": "Backend Architecture & APIs",
-      "items": ["FastAPI", "Flask", "Uvicorn", "Pydantic", "REST APIs", "JWT", "OAuth 2.0", "UV", "Poetry"]
+      "category": "Backend",
+      "items": ["FastAPI", "Flask", "Pydantic", "OAuth 2.0", "UV", "Poetry"]
     },
     {
       "category": "Databases & Caching",

@@ -390,7 +390,7 @@
           class="nav-link {currentTab === item.id && !selectedProject ? 'active' : ''}"
           onclick={closeMobileMenu}
         >
-          {item.label}
+          <span class="nav-key">[{item.key}]</span>{item.label}
         </a>
       {/each}
     </nav>
@@ -468,37 +468,6 @@
           </div>
         {/if}
 
-        <!-- Skills -->
-        {#if skillsData}
-          <div class="section-block">
-            <h2 class="section-heading"><span class="heading-hash">#</span>skills</h2>
-            <div class="skills-grid">
-              {#each skillsData.technical as cat}
-                <div class="skill-category">
-                  <span class="skill-cat-title">{cat.category}:</span>
-                  <div class="skill-cat-content">
-                    {#if cat.primary}
-                      <div class="skill-subline">
-                        <span class="skill-sublabel">Primary:</span>
-                        <span class="skill-subitems">{cat.primary.join(', ')}</span>
-                      </div>
-                      {#if cat.familiar}
-                        <div class="skill-subline">
-                          <span class="skill-sublabel">Familiar:</span>
-                          <span class="skill-subitems">{cat.familiar.join(', ')}</span>
-                        </div>
-                      {/if}
-                    {:else if cat.items}
-                      <div class="skill-subline">
-                        <span class="skill-subitems">{cat.items.join(', ')}</span>
-                      </div>
-                    {/if}
-                  </div>
-                </div>
-              {/each}
-            </div>
-          </div>
-        {/if}
 
         <!-- Experience Preview -->
         <div class="section-block">
@@ -874,6 +843,20 @@
     padding-bottom: 2px;
   }
 
+  .nav-key {
+    color: var(--text-muted);
+    font-size: 0.85em;
+    margin-right: 0.35rem;
+    opacity: 0.65;
+    transition: opacity 0.2s ease, color 0.2s ease;
+  }
+
+  .nav-link:hover .nav-key,
+  .nav-link.active .nav-key {
+    opacity: 1;
+    color: var(--text-secondary);
+  }
+
   .nav-link::after {
     content: '';
     position: absolute;
@@ -1187,87 +1170,6 @@
     font-size: 1rem;
   }
 
-  /* ═══════════════════════════════════════════════════════
-     SKILLS
-     ═══════════════════════════════════════════════════════ */
-  .skills-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
-  }
-
-  .skill-category {
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
-    padding: 0.75rem 0.85rem;
-    margin: 0 -0.85rem;
-    border-radius: 6px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.04);
-    transition: background 0.2s ease;
-  }
-
-  .skill-category:last-child {
-    border-bottom: none;
-  }
-
-  .skill-category:hover {
-    background: rgba(255, 255, 255, 0.03);
-  }
-
-  .skill-category:hover .skill-cat-title {
-    color: #f3ece2;
-  }
-
-  .skill-category:hover .skill-cat-content {
-    border-left-color: rgba(255, 255, 255, 0.22);
-  }
-
-  .skill-category:hover .skill-subitems {
-    color: var(--text-primary);
-  }
-
-  .skill-cat-title {
-    font-family: var(--font-code);
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    letter-spacing: 0.01em;
-    transition: color 0.2s ease;
-    line-height: 1.3;
-  }
-
-  .skill-cat-content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.25rem;
-    padding: 0.05rem 0 0.05rem 0.85rem;
-    margin-left: 0.1rem;
-    border-left: 2px solid rgba(255, 255, 255, 0.08);
-    transition: border-color 0.25s ease;
-  }
-
-  .skill-subline {
-    display: flex;
-    align-items: baseline;
-    gap: 0.5rem;
-    font-size: 1rem;
-    line-height: 1.5;
-    flex-wrap: wrap;
-  }
-
-  .skill-sublabel {
-    font-family: var(--font-code);
-    font-size: 0.92rem;
-    color: var(--text-muted);
-    font-weight: 500;
-    flex-shrink: 0;
-  }
-
-  .skill-subitems {
-    color: var(--text-secondary);
-    transition: color 0.2s ease;
-  }
 
   /* ═══════════════════════════════════════════════════════
      PREVIEW CARDS (Home page)
@@ -2126,13 +2028,6 @@
       grid-template-columns: 1fr;
     }
 
-    .skill-cat-title {
-      font-size: 0.95rem;
-    }
-
-    .skill-subline {
-      font-size: 0.95rem;
-    }
 
     .detail-bar {
       flex-direction: column;
