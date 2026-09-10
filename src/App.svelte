@@ -1183,7 +1183,7 @@
   }
 
   .exp-prose {
-    margin-top: 0.5rem;
+    margin-top: 1.15rem;
     font-size: 1rem;
   }
 
@@ -1523,6 +1523,7 @@
   .meta-val {
     color: var(--text-secondary);
     font-size: 0.98rem;
+    font-style: italic;
   }
 
   /* ═══════════════════════════════════════════════════════

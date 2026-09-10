@@ -2,7 +2,7 @@
 *June 2026 – Present*
 
 **Bot:** [@olx_search_notifications_bot](https://t.me/olx_search_notifications_bot) *(Пошук квартир в оренду)*
-**Tech Stack:** Python, Aiogram 3, Telethon, BeautifulSoup4, MongoDB, Redis, Docker, Monobank API
+**Tech Stack:** *Python, Aiogram 3, Telethon, BeautifulSoup4, MongoDB, Redis, Docker, Monobank API*
 
 - Architected an asynchronous platform for aggregating real-time apartment listings from **OLX**, **LUN**, and multiple **Telegram channels**.
 - Bypassed Cloudflare TLS fingerprinting by replacing standard HTTP clients with **`curl_cffi` browser impersonation**, dynamic **SOCKS5/HTTP proxy rotation**, and distributed **multi-session Telegram accounts**.
