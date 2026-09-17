@@ -4,8 +4,8 @@
     "role": "Python Developer",
     "type": "Freelance",
     "period": "Jun 2026 – Present",
-    "botUrl": "https://t.me/olx_search_notifications_bot",
-    "botName": "@olx_search_notifications_bot",
+    "botUrl": "https://t.me/shukach_kvartyr_bot",
+    "botName": "@shukach_kvartyr_bot",
     "botDesc": "Пошук квартир в оренду",
     "techStack": ["Python", "Aiogram 3", "Telethon", "MongoDB", "Redis", "Docker"]
   }
