@@ -2,6 +2,9 @@
   import { onMount } from 'svelte';
   import { parse } from 'marked';
   import DOMPurify from 'dompurify';
+  import { fade } from 'svelte/transition';
+  import { flip } from 'svelte/animate';
+  import { cubicOut } from 'svelte/easing';
 
   // Navigation Items
   const navItems = [
@@ -10,8 +13,19 @@
     { key: 'p', label: 'projects', id: 'projects', hash: '#/projects' },
   ];
 
+  const socialLinks = [
+    { label: 'LinkedIn', handle: 'vladyslav-panasiuk', url: 'https://www.linkedin.com/in/vladyslav-panasiuk-481582370' },
+    { label: 'GitHub', handle: '@th0truth', url: 'https://github.com/th0truth' },
+    { label: 'DEV Community', short: 'DEV', handle: '@th0truth', url: 'https://dev.to/th0truth' },
+  ];
+
   let currentTab = $state('home');
   let mobileMenuOpen = $state(false);
+  let scrolled = $state(false);
+
+  function handleScroll() {
+    scrolled = window.scrollY > 12;
+  }
 
   function closeMobileMenu() {
     mobileMenuOpen = false;
@@ -53,6 +67,44 @@
     botDesc?: string;
     techStack: string[];
     htmlContent?: string;
+  }
+
+  const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+  // Parses "Jun 2026" (or "June 2026"); "Present" resolves to the current month
+  function parseMonthYear(text: string): { month: number; year: number } | null {
+    if (/^present$/i.test(text.trim())) {
+      const now = new Date();
+      return { month: now.getMonth(), year: now.getFullYear() };
+    }
+    const m = text.trim().match(/^([a-z]{3,})\.?\s+(\d{4})$/i);
+    if (!m) return null;
+    const month = MONTHS.findIndex(name => name.toLowerCase().startsWith(m[1].slice(0, 3).toLowerCase()));
+    return month === -1 ? null : { month, year: Number(m[2]) };
+  }
+
+  // "Jun 2026 – Present" -> { label: "June 2026 – Present", duration: "5 months" }
+  function formatPeriod(period: string): { label: string; duration: string } {
+    const parts = period.split(/\s+[–—-]\s+/);
+    if (parts.length !== 2) return { label: period, duration: '' };
+
+    const start = parseMonthYear(parts[0]);
+    const end = parseMonthYear(parts[1]);
+    const expand = (text: string, d: { month: number; year: number } | null) =>
+      d && !/^present$/i.test(text.trim()) ? `${MONTHS[d.month]} ${d.year}` : text.trim();
+    const label = `${expand(parts[0], start)} – ${expand(parts[1], end)}`;
+    if (!start || !end) return { label, duration: '' };
+
+    // Inclusive month count, matching how LinkedIn reports tenure
+    const total = (end.year - start.year) * 12 + (end.month - start.month) + 1;
+    if (total < 1) return { label, duration: '' };
+    const years = Math.floor(total / 12);
+    const months = total % 12;
+    const duration = [
+      years ? `${years} ${years === 1 ? 'year' : 'years'}` : '',
+      months ? `${months} ${months === 1 ? 'month' : 'months'}` : '',
+    ].filter(Boolean).join(' ');
+    return { label, duration };
   }
 
   let experiences = $state<ExperienceMeta[]>([]);
@@ -140,6 +192,11 @@
         }
       }
     }
+  }
+
+  function handleHashChange() {
+    syncRouteFromHash();
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' });
   }
 
   function handleKeydown(e: KeyboardEvent) {
@@ -315,7 +372,7 @@
 
     const target = e.target as HTMLElement;
     if (target) {
-      const interactive = target.closest('a, button, [role="button"], input, textarea, select, label, [data-src], .screenshot-item, .project-card, .tag, .filter-chip');
+      const interactive = target.closest('a, button, [role="button"], input, textarea, select, label, [data-src], .screenshot-item, .repo-row, .tag, .filter-chip');
       const shouldHover = !!interactive;
       if (isHovered !== shouldHover) {
         isHovered = shouldHover;
@@ -352,10 +409,17 @@
     fetchSelectedProjects();
     syncRouteFromHash();
 
+    // Every route change starts at the top, including browser back/forward
+    if ('scrollRestoration' in history) {
+      history.scrollRestoration = 'manual';
+    }
+
     animFrameId = requestAnimationFrame(animateRing);
 
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('keydown', handleKeydown);
-    window.addEventListener('hashchange', syncRouteFromHash);
+    window.addEventListener('hashchange', handleHashChange);
     window.addEventListener('click', handleContainerClick);
     window.addEventListener('mousemove', updateCursorPos);
     window.addEventListener('mousedown', handleMouseDown);
@@ -364,8 +428,9 @@
 
     return () => {
       cancelAnimationFrame(animFrameId);
+      window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('keydown', handleKeydown);
-      window.removeEventListener('hashchange', syncRouteFromHash);
+      window.removeEventListener('hashchange', handleHashChange);
       window.removeEventListener('click', handleContainerClick);
       window.removeEventListener('mousemove', updateCursorPos);
       window.removeEventListener('mousedown', handleMouseDown);
@@ -375,7 +440,7 @@
   });
 </script>
 
-<main class="site-wrapper">
+<div class="site-topbar {scrolled ? 'scrolled' : ''}">
   <!-- Header -->
   <header class="site-header">
     <a href="#/" class="header-brand">
@@ -383,14 +448,15 @@
     </a>
 
     <!-- Desktop nav -->
-    <nav class="nav-desktop">
+    <nav class="nav-desktop" aria-label="Main">
       {#each navItems as item}
         <a
           href={item.hash}
           class="nav-link {currentTab === item.id && !selectedProject ? 'active' : ''}"
+          aria-current={currentTab === item.id && !selectedProject ? 'page' : undefined}
           onclick={closeMobileMenu}
         >
-          <span class="nav-key">[{item.key}]</span>{item.label}
+          <span class="nav-key" aria-hidden="true">[{item.key}]</span>{item.label}
         </a>
       {/each}
     </nav>
@@ -400,6 +466,7 @@
       class="hamburger-btn"
       onclick={() => mobileMenuOpen = !mobileMenuOpen}
       aria-label="Toggle navigation menu"
+      aria-expanded={mobileMenuOpen}
     >
       <span class="hamburger-line {mobileMenuOpen ? 'open' : ''}"></span>
       <span class="hamburger-line {mobileMenuOpen ? 'open' : ''}"></span>
@@ -421,7 +488,9 @@
       {/each}
     </nav>
   {/if}
+</div>
 
+<main class="site-wrapper">
   <div class="content-area">
 
     <!-- ═══════════════════ HOME ═══════════════════ -->
@@ -456,6 +525,11 @@
           <div class="profile-text">
             <h1 class="profile-name">Vladyslav Panasiuk</h1>
             <p class="profile-tagline">software engineer</p>
+            <nav class="profile-links" aria-label="Profiles">
+              {#each socialLinks as link}
+                <a href={link.url} target="_blank" rel="noreferrer" class="profile-link">{(link.short ?? link.label).toLowerCase()}<span class="profile-link-arrow">↗</span></a>
+              {/each}
+            </nav>
           </div>
         </div>
 
@@ -475,25 +549,33 @@
           {#if loadingExp}
             <p class="loading-text">loading...</p>
           {:else if experiences.length > 0}
-            {#each experiences as exp}
-              <a href="#/experience" class="preview-card">
-                <div class="preview-card-top">
-                  <div class="preview-card-left">
-                    <span class="preview-role">{exp.role}</span>
-                    <span class="preview-badge">{exp.type}</span>
+            <div class="repo-list">
+              {#each experiences as exp}
+                {@const period = formatPeriod(exp.period)}
+                <a href="#/experience" class="preview-card">
+                  <div class="preview-card-top">
+                    <div class="preview-card-left">
+                      <span class="preview-role">{exp.role}</span>
+                      <span class="preview-badge">{exp.type}</span>
+                    </div>
+                    <span class="preview-period">
+                      {period.label}
+                      {#if period.duration}
+                        <span class="period-duration">· {period.duration}</span>
+                      {/if}
+                    </span>
                   </div>
-                  <span class="preview-period">{exp.period}</span>
-                </div>
-                {#if exp.techStack && exp.techStack.length > 0}
-                  <div class="preview-tags">
-                    {#each exp.techStack as tech}
-                      <span class="pill">{tech}</span>
-                    {/each}
-                  </div>
-                {/if}
-                <span class="card-arrow">→</span>
-              </a>
-            {/each}
+                  {#if exp.techStack && exp.techStack.length > 0}
+                    <div class="preview-tags">
+                      {#each exp.techStack as tech}
+                        <span class="pill">{tech}</span>
+                      {/each}
+                    </div>
+                  {/if}
+                  <span class="card-arrow">→</span>
+                </a>
+              {/each}
+            </div>
           {/if}
         </div>
 
@@ -503,17 +585,24 @@
           {#if loadingProjects}
             <p class="loading-text">loading...</p>
           {:else if featuredProjects.length > 0}
-            <div class="featured-list">
+            <div class="repo-list">
               {#each featuredProjects as project}
-                <button class="featured-row" onclick={() => openProjectDetail(project)}>
-                  <div class="featured-info">
-                    <span class="featured-name">{project.name}</span>
-                    {#if project.language}
-                      <span class="lang-dot">{project.language}</span>
-                    {/if}
+                <button class="repo-row" onclick={() => openProjectDetail(project)}>
+                  <div class="repo-head">
+                    <span class="repo-name">{project.name}</span>
+                    <span class="repo-meta">
+                      {#if project.language}
+                        <span class="repo-lang">{project.language.toLowerCase()}</span>
+                      {/if}
+                      {#each getProjectTags(project).slice(0, 3) as tag}
+                        <span class="repo-dot">·</span><span class="repo-tag">{tag}</span>
+                      {/each}
+                      {#if project.stars > 0}
+                        <span class="repo-stars">{project.stars}<span class="repo-star-glyph">★</span></span>
+                      {/if}
+                    </span>
                   </div>
-                  <p class="featured-desc">{project.description}</p>
-                  <span class="card-arrow">→</span>
+                  <p class="repo-desc">{project.description}</p>
                 </button>
               {/each}
             </div>
@@ -536,13 +625,19 @@
         {:else}
           <div class="exp-list">
             {#each experiences as exp}
+              {@const period = formatPeriod(exp.period)}
               <article class="exp-card">
                 <div class="exp-top-row">
                   <div class="exp-title-group">
                     <h3 class="exp-role">{exp.role}</h3>
                     <span class="exp-type-badge">{exp.type}</span>
                   </div>
-                  <span class="exp-period">{exp.period}</span>
+                  <span class="exp-period">
+                    {period.label}
+                    {#if period.duration}
+                      <span class="period-duration">· {period.duration}</span>
+                    {/if}
+                  </span>
                 </div>
 
                 {#if exp.botUrl}
@@ -595,25 +690,30 @@
             {/each}
           </div>
 
-          <div class="project-grid">
-            {#each filteredProjects as project}
-              <button class="project-card" onclick={() => openProjectDetail(project)}>
-                <div class="card-top">
-                  <h3 class="card-name">{project.name}</h3>
-                  {#if project.stars > 0}
-                    <span class="card-stars">★ {project.stars}</span>
-                  {/if}
+          <div class="repo-list">
+            {#each filteredProjects as project (project.slug)}
+              <button
+                class="repo-row"
+                onclick={() => openProjectDetail(project)}
+                in:fade={{ duration: 260, easing: cubicOut }}
+                out:fade={{ duration: 140, easing: cubicOut }}
+                animate:flip={{ duration: 340, easing: cubicOut }}
+              >
+                <div class="repo-head">
+                  <span class="repo-name">{project.name}</span>
+                  <span class="repo-meta">
+                    {#if project.language}
+                      <span class="repo-lang">{project.language.toLowerCase()}</span>
+                    {/if}
+                    {#each getProjectTags(project).slice(0, 3) as tag}
+                      <span class="repo-dot">·</span><span class="repo-tag">{tag}</span>
+                    {/each}
+                    {#if project.stars > 0}
+                      <span class="repo-stars">{project.stars}<span class="repo-star-glyph">★</span></span>
+                    {/if}
+                  </span>
                 </div>
-                <p class="card-desc">{project.description}</p>
-                <div class="card-tags">
-                  {#if project.language}
-                    <span class="pill primary">{project.language}</span>
-                  {/if}
-                  {#each getProjectTags(project) as tag}
-                    <span class="pill">{tag}</span>
-                  {/each}
-                </div>
-                <span class="card-arrow">→</span>
+                <p class="repo-desc">{project.description}</p>
               </button>
             {/each}
           </div>
@@ -650,18 +750,12 @@
   <footer class="site-footer">
     <h2 class="footer-heading"><span class="heading-hash">#</span>find me here</h2>
     <div class="footer-links">
-      <div class="footer-link-item">
-        <span class="footer-link-label">LinkedIn</span>
-        <a href="https://www.linkedin.com/in/vladyslav-panasiuk-481582370" target="_blank" rel="noreferrer" class="footer-link-url">vladyslav-panasiuk →</a>
-      </div>
-      <div class="footer-link-item">
-        <span class="footer-link-label">GitHub</span>
-        <a href="https://github.com/th0truth" target="_blank" rel="noreferrer" class="footer-link-url">@th0truth →</a>
-      </div>
-      <div class="footer-link-item">
-        <span class="footer-link-label">DEV Community</span>
-        <a href="https://dev.to/th0truth" target="_blank" rel="noreferrer" class="footer-link-url">@th0truth →</a>
-      </div>
+      {#each socialLinks as link}
+        <a href={link.url} target="_blank" rel="noreferrer" class="footer-link-item">
+          <span class="footer-link-label">{link.label}</span>
+          <span class="footer-link-url">{link.handle} →</span>
+        </a>
+      {/each}
     </div>
     <p class="footer-copy">© {new Date().getFullYear()} Vladyslav Panasiuk</p>
   </footer>
@@ -797,22 +891,46 @@
      ═══════════════════════════════════════════════════════ */
   .site-wrapper {
     width: 100%;
-    max-width: 720px;
+    max-width: 52rem;
     margin: 0 auto;
-    padding: 3rem 1.5rem 4rem;
+    padding: 6rem 1.5rem 4rem;
     position: relative;
   }
 
   /* ═══════════════════════════════════════════════════════
      HEADER
      ═══════════════════════════════════════════════════════ */
+  .site-topbar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    width: 100%;
+    background: transparent;
+    padding: 0.6rem 1.5rem 0;
+  }
+
   .site-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 4rem;
-    padding-bottom: 1.5rem;
-    border-bottom: 1px solid var(--border-color);
+    gap: 1rem;
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 0.9rem 1.25rem;
+    border: 1px solid transparent;
+    border-radius: 12px;
+    transition: background 0.3s ease, backdrop-filter 0.3s ease,
+                border-color 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .site-topbar.scrolled .site-header {
+    background: rgba(17, 17, 17, 0.72);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-color: var(--border-color);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
   }
 
   .header-brand {
@@ -820,6 +938,7 @@
   }
 
   .brand-name {
+    white-space: nowrap;
     font-family: var(--font-code);
     font-size: 1.15rem;
     font-weight: 500;
@@ -834,6 +953,7 @@
   }
 
   .nav-link {
+    white-space: nowrap;
     font-family: var(--font-code);
     font-size: 0.95rem;
     color: var(--text-muted);
@@ -1005,6 +1125,41 @@
     margin-top: 0.3rem;
   }
 
+  .profile-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem 1.1rem;
+    margin-top: 0.65rem;
+  }
+
+  .profile-link {
+    font-family: var(--font-code);
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: var(--border-hover);
+    transition: color 0.2s ease, text-decoration-color 0.2s ease;
+  }
+
+  .profile-link:hover {
+    color: var(--text-primary);
+    text-decoration-color: var(--text-secondary);
+  }
+
+  .profile-link-arrow {
+    display: inline-block;
+    margin-left: 0.15rem;
+    font-size: 0.85em;
+    color: var(--text-muted);
+    transition: transform 0.2s ease, color 0.2s ease;
+  }
+
+  .profile-link:hover .profile-link-arrow {
+    color: var(--text-primary);
+    transform: translate(1px, -1px);
+  }
+
   /* ═══════════════════════════════════════════════════════
      CONTENT SECTIONS
      ═══════════════════════════════════════════════════════ */
@@ -1025,6 +1180,7 @@
 
   @media (prefers-reduced-motion: reduce) {
     .page-section { animation: none; }
+    .outer-ring, .inner-ring { animation: none; }
   }
 
   .page-title {
@@ -1073,8 +1229,9 @@
      ═══════════════════════════════════════════════════════ */
   .prose {
     color: var(--text-secondary);
-    font-size: 1rem;
+    font-size: 1.0625rem;
     line-height: 1.8;
+    max-width: 68ch;
   }
 
   :global(.prose p) {
@@ -1167,7 +1324,6 @@
 
   .exp-prose {
     margin-top: 1.15rem;
-    font-size: 1rem;
   }
 
 
@@ -1176,19 +1332,19 @@
      ═══════════════════════════════════════════════════════ */
   .preview-card {
     display: block;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 1.35rem 1.45rem;
-    margin-bottom: 0.85rem;
+    padding: 1.3rem 1.4rem;
+    border-bottom: 1px solid var(--border-color);
     text-decoration: none;
     color: inherit;
-    transition: border-color 0.2s ease, background 0.2s ease;
+    transition: background 0.15s ease;
     position: relative;
   }
 
+  .preview-card:last-child {
+    border-bottom: none;
+  }
+
   .preview-card:hover {
-    border-color: var(--border-hover);
     background: var(--bg-card-hover);
   }
 
@@ -1231,6 +1387,10 @@
     letter-spacing: 0.04em;
   }
 
+  .period-duration {
+    color: var(--text-secondary);
+  }
+
   .preview-tags {
     display: flex;
     flex-wrap: wrap;
@@ -1247,9 +1407,7 @@
     transition: color 0.2s ease, transform 0.2s ease;
   }
 
-  .preview-card:hover .card-arrow,
-  .featured-row:hover .card-arrow,
-  .project-card:hover .card-arrow {
+  .preview-card:hover .card-arrow {
     color: var(--text-primary);
     transform: translateX(3px);
   }
@@ -1257,71 +1415,12 @@
   /* ═══════════════════════════════════════════════════════
      FEATURED PROJECTS
      ═══════════════════════════════════════════════════════ */
-  .featured-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.85rem;
-  }
-
-  .featured-row {
-    display: block;
-    width: 100%;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 1.35rem 1.45rem;
-    text-align: left;
-    transition: border-color 0.2s ease, background 0.2s ease;
-    position: relative;
-    cursor: pointer;
-  }
-
-  .featured-row:hover {
-    border-color: var(--border-hover);
-    background: var(--bg-card-hover);
-  }
-
-  .featured-info {
-    display: flex;
-    align-items: center;
-    gap: 0.65rem;
-    margin-bottom: 0.4rem;
-    flex-wrap: wrap;
-  }
-
-  .featured-name {
-    font-family: var(--font-code);
-    font-size: 1.08rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    overflow-wrap: break-word;
-    word-break: break-word;
-  }
-
-  .lang-dot {
-    font-family: var(--font-code);
-    font-size: 0.82rem;
-    color: var(--text-muted);
-    border: 1px solid var(--border-color);
-    padding: 0.1rem 0.45rem;
-    border-radius: 3px;
-    white-space: nowrap;
-    flex-shrink: 0;
-  }
-
-  .featured-desc {
-    font-size: 0.98rem;
-    color: var(--text-secondary);
-    line-height: 1.6;
-    padding-right: 2rem;
-  }
-
   .view-all-link {
     display: inline-block;
     font-family: var(--font-code);
     font-size: 0.95rem;
     color: var(--text-muted);
-    margin-top: 1.15rem;
+    margin-top: 1.5rem;
     text-decoration: none;
     transition: color 0.2s ease;
   }
@@ -1391,16 +1490,14 @@
   .exp-meta {
     font-size: 0.98rem;
     color: var(--text-secondary);
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.4rem;
-    align-items: center;
-    margin-bottom: 0.3rem;
+    line-height: 1.65;
+    margin-bottom: 0.35rem;
   }
 
   .meta-key {
     font-weight: 600;
     color: var(--text-primary);
+    margin-right: 0.15rem;
   }
 
   .meta-link {
@@ -1463,68 +1560,102 @@
     background: rgba(255, 255, 255, 0.04);
   }
 
-  .project-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.85rem;
-  }
-
-  .project-card {
+  .repo-list {
     display: flex;
     flex-direction: column;
     background: var(--bg-card);
     border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 1.35rem 1.45rem;
-    text-align: left;
-    transition: border-color 0.2s ease, background 0.2s ease;
-    cursor: pointer;
-    position: relative;
-    min-height: 160px;
+    border-radius: 10px;
+    overflow: hidden;
   }
 
-  .project-card:hover {
-    border-color: var(--border-hover);
+  .repo-row {
+    display: block;
+    width: 100%;
+    text-align: left;
+    cursor: pointer;
+    padding: 1.3rem 1.4rem;
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+    transition: background 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .repo-row:last-child {
+    border-bottom: none;
+  }
+
+  .repo-row:hover {
     background: var(--bg-card-hover);
   }
 
-  .card-top {
+  .repo-head {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    margin-bottom: 0.5rem;
-    gap: 0.5rem;
+    align-items: baseline;
+    gap: 1rem;
+    margin-bottom: 0.45rem;
   }
 
-  .card-name {
+  .repo-name {
     font-family: var(--font-code);
-    font-size: 1.05rem;
+    font-size: 1.08rem;
     font-weight: 600;
     color: var(--text-primary);
+    letter-spacing: 0.01em;
     overflow-wrap: break-word;
     word-break: break-word;
+    transition: color 0.15s ease;
   }
 
-  .card-stars {
+  .repo-row:hover .repo-name {
+    color: #ffffff;
+  }
+
+  .repo-meta {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 0.35rem;
     font-family: var(--font-code);
-    font-size: 0.85rem;
+    font-size: 0.82rem;
     color: var(--text-muted);
+    text-align: right;
     flex-shrink: 0;
   }
 
-  .card-desc {
-    font-size: 0.98rem;
+  .repo-lang {
     color: var(--text-secondary);
-    line-height: 1.6;
-    margin-bottom: 0.85rem;
-    padding-right: 1.5rem;
   }
 
-  .card-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem;
-    margin-top: auto;
+  .repo-dot {
+    color: var(--text-muted);
+    opacity: 0.55;
+  }
+
+  .repo-tag {
+    color: var(--text-muted);
+  }
+
+  .repo-stars {
+    color: var(--text-secondary);
+    margin-left: 0.4rem;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.12rem;
+  }
+
+  .repo-star-glyph {
+    color: var(--text-muted);
+    font-size: 0.9em;
+  }
+
+  .repo-desc {
+    font-size: 0.96rem;
+    color: var(--text-primary);
+    opacity: 0.72;
+    line-height: 1.6;
+    max-width: 56ch;
   }
 
   /* ═══════════════════════════════════════════════════════
@@ -1533,16 +1664,13 @@
   .pill {
     font-family: var(--font-code);
     font-size: 0.8rem;
-    color: var(--text-muted);
+    color: var(--text-primary);
     border: 1px solid var(--border-color);
     padding: 0.12rem 0.48rem;
     border-radius: 3px;
     white-space: nowrap;
   }
 
-  .pill.primary {
-    color: var(--text-secondary);
-  }
 
   /* ═══════════════════════════════════════════════════════
      PROJECT DETAIL
@@ -1736,7 +1864,7 @@
 
   .footer-links {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 1.75rem;
     margin-bottom: 2.5rem;
   }
@@ -1745,6 +1873,11 @@
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
+    text-decoration: none;
+  }
+
+  .footer-link-item:hover .footer-link-url {
+    color: var(--text-secondary);
   }
 
   .footer-link-label {
@@ -1758,10 +1891,6 @@
     color: var(--text-muted);
     text-decoration: none;
     transition: color 0.2s ease;
-  }
-
-  .footer-link-url:hover {
-    color: var(--text-secondary);
   }
 
   .footer-copy {
@@ -1815,9 +1944,10 @@
 
   .mobile-menu {
     position: absolute;
-    top: 4.5rem;
-    left: 1rem;
-    right: 1rem;
+    top: calc(100% + 0.5rem);
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(calc(100% - 2rem), 720px);
     background: rgba(25, 25, 25, 0.98);
     backdrop-filter: blur(20px);
     -webkit-backdrop-filter: blur(20px);
@@ -1858,19 +1988,27 @@
      ═══════════════════════════════════════════════════════ */
   @media (max-width: 768px) {
     .site-wrapper {
-      padding: 2rem 1.25rem 3rem;
+      padding: 5rem 1.25rem 3rem;
+    }
+
+    .site-topbar {
+      padding: 0.5rem 1rem 0;
     }
 
     .site-header {
-      margin-bottom: 2.5rem;
+      padding: 0.85rem 1.1rem;
     }
 
     .nav-desktop {
+      gap: 1.25rem;
+    }
+
+    .nav-key {
       display: none;
     }
 
-    .hamburger-btn {
-      display: flex;
+    .profile-links {
+      justify-content: center;
     }
 
     .profile-intro {
@@ -1906,8 +2044,19 @@
       text-align: center;
     }
 
-    .project-grid {
-      grid-template-columns: 1fr;
+    .repo-head {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.3rem;
+    }
+
+    .repo-meta {
+      justify-content: flex-start;
+      text-align: left;
+    }
+
+    .repo-stars {
+      margin-left: 0.15rem;
     }
 
     .preview-card-top {
@@ -1956,6 +2105,10 @@
       gap: 1.25rem;
     }
 
+    .prose {
+      font-size: 1rem;
+    }
+
     .section-block {
       margin-top: 2.75rem;
     }
@@ -1974,7 +2127,27 @@
 
   @media (max-width: 480px) {
     .site-wrapper {
-      padding: 1.5rem 1rem 2.5rem;
+      padding: 4.5rem 1rem 2.5rem;
+    }
+
+    .site-topbar {
+      padding: 0.5rem 0.5rem 0;
+    }
+
+    .site-header {
+      padding: 0.75rem 0.85rem;
+    }
+
+    .brand-name {
+      font-size: 1.05rem;
+    }
+
+    .nav-desktop {
+      gap: 0.9rem;
+    }
+
+    .nav-link {
+      font-size: 0.875rem;
     }
 
     .profile-name {
@@ -2016,14 +2189,6 @@
       font-size: 0.8rem;
     }
 
-    .featured-row {
-      padding: 1.15rem 1.25rem;
-    }
-
-    .featured-name {
-      font-size: 1rem;
-    }
-
     :global(.screenshots-group) {
       grid-template-columns: 1fr;
     }
@@ -2044,6 +2209,103 @@
 
     :global(.detail-prose h1) {
       text-align: center;
+    }
+  }
+
+  /* Very narrow phones: fall back to the hamburger menu */
+  @media (max-width: 359px) {
+    .nav-desktop {
+      display: none;
+    }
+
+    .hamburger-btn {
+      display: flex;
+    }
+  }
+
+  /* Keyboard shortcut hints are meaningless without a keyboard */
+  @media (hover: none) {
+    .nav-key {
+      display: none;
+    }
+  }
+
+  /* Comfortable tap targets on touch screens */
+  @media (pointer: coarse) {
+    .nav-link {
+      padding: 0.5rem 0;
+    }
+
+    .nav-link::after {
+      bottom: 4px;
+    }
+
+    .filter-btn {
+      padding: 0.55rem 0.95rem;
+    }
+
+    .profile-link {
+      padding: 0.35rem 0;
+    }
+
+    .back-link {
+      padding: 0.5rem 0;
+    }
+
+    .footer-link-item {
+      padding: 0.25rem 0;
+    }
+  }
+
+  /* Clean, ink-friendly output when HR prints or saves as PDF */
+  @media print {
+    .site-topbar,
+    .filter-bar,
+    .back-link,
+    .view-all-link,
+    .card-arrow,
+    .radar-svg,
+    .glow-aura,
+    .image-overlay,
+    .custom-cursor-dot,
+    .custom-cursor-ring {
+      display: none !important;
+    }
+
+    .site-wrapper {
+      max-width: none;
+      padding: 0;
+    }
+
+    .page-section {
+      animation: none;
+    }
+
+    .repo-list {
+      border-radius: 0;
+    }
+
+    .repo-row,
+    .preview-card,
+    .exp-card {
+      break-inside: avoid;
+    }
+
+    .pill {
+      color: var(--text-primary);
+    }
+
+    .footer-link-item::after {
+      content: attr(href);
+      font-family: var(--font-code);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    :global(.prose a[href^="http"]::after) {
+      content: ' (' attr(href) ')';
+      font-size: 0.8em;
+      color: var(--text-muted);
     }
   }
 </style>
