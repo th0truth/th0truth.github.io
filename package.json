@@ -9,7 +9,6 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "@lucide/svelte": "^1.26.0",
     "@sveltejs/vite-plugin-svelte": "^6.0.0",
     "marked": "^18.0.7",
     "svelte": "^5.0.0",
@@ -18,7 +17,6 @@
   },
   "dependencies": {
     "@types/dompurify": "^3.0.5",
-    "dompurify": "^3.4.12",
-    "svelte-spa-router": "^5.1.1"
+    "dompurify": "^3.4.12"
   }
 }

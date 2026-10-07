@@ -7,7 +7,6 @@ Personal website and portfolio of Vladyslav Panasiuk (`th0truth`), built with Sv
 - **Framework:** Svelte 5
 - **Tooling:** Vite
 - **Language:** TypeScript
-- **Icons:** Lucide Svelte
 
 ## Local Development
 

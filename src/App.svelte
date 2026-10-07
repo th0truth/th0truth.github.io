@@ -35,24 +35,6 @@
   let bioHtml = $state('');
   let loadingMd = $state(true);
 
-  // Skills State
-  interface SkillCategory {
-    category: string;
-    primary?: string[];
-    familiar?: string[];
-    items?: string[];
-  }
-  interface SoftSkill {
-    title: string;
-    icon: string;
-    description: string;
-  }
-  interface SkillsData {
-    technical: SkillCategory[];
-    soft: SoftSkill[];
-  }
-  let skillsData = $state<SkillsData | null>(null);
-
   // Modal Image Overlay State
   let activeImageOverlay = $state<string | null>(null);
 
@@ -113,7 +95,6 @@
   interface ProjectMeta {
     slug: string;
     name: string;
-    icon?: string;
     description: string;
     language: string;
     stars: number;
@@ -230,17 +211,6 @@
       console.error('Error loading bio markdown:', err);
     } finally {
       loadingMd = false;
-    }
-  }
-
-  async function loadSkills() {
-    try {
-      const res = await fetch('./content/skills/skills.json');
-      if (res.ok) {
-        skillsData = await res.json();
-      }
-    } catch (err) {
-      console.error('Error loading skills:', err);
     }
   }
 
@@ -404,7 +374,6 @@
 
   onMount(() => {
     loadBio();
-    loadSkills();
     loadExperiences();
     fetchSelectedProjects();
     syncRouteFromHash();
