@@ -53,8 +53,6 @@ html {
 
 body {
   background-color: var(--bg-main);
-  background-image: url('./assets/bg.png');
-  background-repeat: repeat;
   color: var(--text-primary);
   font-family: var(--font-body);
   font-size: 1rem;
@@ -65,6 +63,25 @@ body {
   -moz-osx-font-smoothing: grayscale;
   overflow-wrap: break-word;
   word-break: break-word;
+}
+
+/* Faint graph-paper grid behind the top of the page, fading out (scrolls away) */
+body::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 110vh;
+  z-index: -1;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(232, 224, 212, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(232, 224, 212, 0.045) 1px, transparent 1px);
+  background-size: 36px 36px;
+  background-position: center top;
+  -webkit-mask-image: radial-gradient(ellipse 75% 65% at 50% 0%, #000 30%, transparent 100%);
+  mask-image: radial-gradient(ellipse 75% 65% at 50% 0%, #000 30%, transparent 100%);
 }
 
 a {
@@ -111,6 +128,9 @@ button {
 
   body {
     background: #ffffff;
-    background-image: none;
+  }
+
+  body::before {
+    display: none;
   }
 }
