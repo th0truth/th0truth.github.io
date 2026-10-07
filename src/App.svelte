@@ -576,7 +576,7 @@
               {/each}
             </div>
             <a href="#/projects" class="view-all-link">
-              view all projects →
+              view all selected projects →
             </a>
           {/if}
         </div>

@@ -14,13 +14,22 @@
     "description": "Modular LMS backend API for academic course and workflow management.",
     "language": "Python",
     "stars": 0,
-    "tags": ["fastapi", "mongodb", "redis", "docker", "lms"],
+    "tags": ["fastapi", "lms", "mongodb", "redis", "docker"],
     "githubUrl": "https://github.com/UnifiedLMS/unified-api"
+  },
+  {
+    "slug": "ffmpeg-optimizer",
+    "name": "ffmpeg-optimizer",
+    "description": "FFmpeg-powered CLI that compresses videos into web-ready MP4s.",
+    "language": "Python",
+    "stars": 0,
+    "tags": ["ffmpeg", "video-processing", "cli", "h264"],
+    "githubUrl": "https://github.com/th0truth/ffmpeg-optimizer"
   },
   {
     "slug": "fastapi-nosql-template",
     "name": "FastAPI-NoSQL-Template",
-    "description": "High-performance FastAPI + NoSQL template.",
+    "description": "Production-ready FastAPI starter with MongoDB, Redis, GraphQL and Prometheus metrics.",
     "language": "Python",
     "stars": 0,
     "tags": ["fastapi", "mongodb", "redis", "graphql", "prometheus"],
@@ -79,14 +88,5 @@
     "stars": 0,
     "tags": ["selenium", "automation", "typing-bot", "wpm"],
     "githubUrl": "https://github.com/th0truth/botwpm"
-  },
-  {
-    "slug": "ffmpeg-optimizer",
-    "name": "ffmpeg-optimizer",
-    "description": "CRF-driven FFmpeg video optimizer that compresses to streaming-ready H.264 MP4.",
-    "language": "Python",
-    "stars": 0,
-    "tags": ["ffmpeg", "video-processing", "cli", "h264"],
-    "githubUrl": "https://github.com/th0truth/ffmpeg-optimizer"
   }
 ]
