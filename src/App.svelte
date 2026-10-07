@@ -640,7 +640,7 @@
     <!-- ═══════════════════ PROJECTS ═══════════════════ -->
     {:else if currentTab === 'projects' && !selectedProject}
       <section class="page-section" id="projects-section">
-        <h2 class="page-title"><span class="heading-hash">#</span>projects</h2>
+        <h2 class="page-title"><span class="heading-hash">#</span>selected projects</h2>
 
         {#if loadingProjects}
           <p class="loading-text">loading...</p>

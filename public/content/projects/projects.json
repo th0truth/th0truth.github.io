@@ -54,15 +54,6 @@
     "githubUrl": "https://github.com/th0truth/stm32-triple-adc-pwm-display"
   },
   {
-    "slug": "cuda-sort",
-    "name": "CUDA Sort",
-    "description": "Parallel sorting algorithm visualizer and CUDA GPGPU benchmarking suite.",
-    "language": "C++",
-    "stars": 0,
-    "tags": ["algorithms", "cuda", "sdl2"],
-    "githubUrl": "https://github.com/th0truth/cuda-sort"
-  },
-  {
     "slug": "kernel32",
     "name": "kernel32",
     "description": "Low-level Win32 system call exploration and lightweight kernel API wrapper.",
@@ -90,39 +81,12 @@
     "githubUrl": "https://github.com/th0truth/botwpm"
   },
   {
-    "slug": "podgen",
-    "name": "PodGen",
-    "description": "RESTful podcast generator with LLM-assisted metadata and RSS feed integration.",
+    "slug": "ffmpeg-optimizer",
+    "name": "ffmpeg-optimizer",
+    "description": "CRF-driven FFmpeg video optimizer that compresses to streaming-ready H.264 MP4.",
     "language": "Python",
     "stars": 0,
-    "tags": ["fastapi", "llm", "rss-integration", "podcast"],
-    "githubUrl": "https://github.com/th0truth/podgen"
-  },
-  {
-    "slug": "podgen-fork",
-    "name": "PodGen Fork",
-    "description": "Enhanced PodGen fork with automated LLM title generation and Telegram alerts.",
-    "language": "Python",
-    "stars": 0,
-    "tags": ["fastapi", "llm", "telegram-bot", "podcast-generator"],
-    "githubUrl": "https://github.com/th0truth/podgen-fork"
-  },
-  {
-    "slug": "keylogger",
-    "name": "keylogger",
-    "description": "Windows input diagnostics utility with global event hooking and hardware telemetry.",
-    "language": "Python",
-    "stars": 0,
-    "tags": ["keylogger", "windows-api", "powershell", "multiprocessing"],
-    "githubUrl": "https://github.com/th0truth/keylogger"
-  },
-  {
-    "slug": "barnsight",
-    "name": "BarnSight",
-    "description": "Edge AI computer vision platform for real-time farm hygiene monitoring.",
-    "language": "Python",
-    "stars": 0,
-    "tags": ["opencv", "yolo", "edge-ai", "fastapi", "computer-vision"],
-    "githubUrl": "https://github.com/barnsight"
+    "tags": ["ffmpeg", "video-processing", "cli", "h264"],
+    "githubUrl": "https://github.com/th0truth/ffmpeg-optimizer"
   }
 ]
