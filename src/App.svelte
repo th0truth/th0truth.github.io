@@ -1664,7 +1664,7 @@
   .pill {
     font-family: var(--font-code);
     font-size: 0.8rem;
-    color: var(--text-primary);
+    color: var(--text-secondary);
     border: 1px solid var(--border-color);
     padding: 0.12rem 0.48rem;
     border-radius: 3px;
